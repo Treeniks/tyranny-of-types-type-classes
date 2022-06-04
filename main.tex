@@ -1,0 +1,91 @@
+\documentclass[sigconf,review,svgnames,dvipsnames,nonacm]{acmart}
+\acmConference[Types 2022]{The Tyranny of Types: Curse or Blessing?}{11 - 14 July, 2022}{Munich}
+\setcopyright{none}
+\copyrightyear{2022}
+\acmYear{2022}
+\acmPrice{0}
+\bibliographystyle{ACM-Reference-Format}
+\usepackage{amsmath}
+%%%%%%%%%%%%%%%% DO NOT EDIT THE COMMANDS ABOVE %%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%% PACKAGES %%%%%%%%%%%%%%%%%%%%%
+\usepackage[english]{babel}
+\usepackage{blindtext}
+\usepackage{minted}
+\usepackage{hyperref}
+\usepackage{microtype}
+% \usepackage{fancyvrb}
+
+\VerbatimFootnotes
+
+
+%%%%%%%%%%%%%%%% DOCUMENT %%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title[Comparing Type Classes, Traits and Modules]{Comparing Haskell's Type Classes to Rust's Traits and Ocaml's Modules}
+% \author{}
+% \affiliation{}
+\author{Thomas Lindae}
+% \authornotemark[1]
+\email{thomas.lindae@tum.de}
+\affiliation{%
+  \institution{Technical University of Munich}
+  % \streetaddress{}
+  % \city{Munich}
+  % \state{Bavaria}
+  \country{Germany}
+}
+
+% ---- Abstract ----
+\begin{abstract}
+%%%%%%%% Write your abstract %%%%%%%%%%%%%%%
+There are many ways to abstract functionality in programming languages. One important idea of abstraction is the notion of interfaces defining functionality for abstract types. Modern languages offer different approaches to such interfaces, some of which with a focus on supporting ad-hoc polymorphism, while others with a focus on data abstraction. We will first see the differences between parametric and ad-hoc polymorphism. Afterwards we will look at three interfacing approaches: Haskell type classes, the type class-inspired Rust traits and Ocaml's ML-inherited module system, and find them to have many similarities.
+\end{abstract}
+\maketitle
+
+% ---- Main Text of the Document ----
+%%%%%%%% If your text is in separate files (recommended), input them here %%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+Programmers are lazy. That is why they tend to spend a lot of time coming up with and developing programming language concepts that allow them to write less code for the same things, and then let the compiler do the rest of the work.
+
+Few things convey that idea better than the concept of polymorphism, a term describing the reusing of functions and methods for varying data types.
+
+There is many different forms of polymorphism, and in this paper we will briefly look at two of them: Parametric and ad-hoc polymorphism.
+
+Ad-hoc polymorphism is primarily used by object oriented programming languages, whereas parametric polymorphism is more well known by its use in functional languages. However, as languages have matured and gained features, most modern languages have their own concepts for both.
+
+Afterwards we will look at one particular implementation of ad-hoc polymorphism: Type Classes. We will find that the concept of type classes also offers a way to define an interface on custom data types and thus compare them to other language interface concepts, in particular Rust Traits and Ocaml Modules.
+
+\input{02_polymorphism}
+
+\input{03_haskell}
+
+\input{04_rust}
+
+\input{05_ocaml}
+
+\section{Conclusion}
+
+Ocaml's module system is increadibly powerful and functors are a unique way of writing generic code. However, they do not have any concept of automatically choosing the right function for the current context. The user will always have to specify which function from which module they want exactly.
+
+Another issue is that juggling functors, modules and module signatures can get very overwhelming and confusing. Whereas with type classes, we were able to create addition for matrices with varying outputs depending on the outputs of the additions for the matrices' element types, in Ocaml, building a generic matrix implementation even without the ability to have varying element types is already similarly complicated.
+
+It is also rather verbose having to apply functors by hand. It is not possible for Ocaml to automatically apply functors and create unnamed modules out of them (although there are ideas on how to do so in limited cases~\cite{modular-type-classes}), and thus, to define a library for generic matrices, the library will only be able to offer a functor that the user must then apply for every type they want to use inside the matrices. It ends up only being one line of code, but it is still not as fluent as other solutions, not to mention one has to come up with a unique name for every one of the resulting modules.
+
+On the other hand, one thing that neither Haskell nor Rust were able to do was to convey the generic idea of a \textit{matrix}. Both in Haskell and Rust, we were able to be generic over the elements of the matrix, \textbf{not} the implementation of it. In Ocaml, thanks to the fact that we can define a generic \verb|Matrix| module signature, wherein we can keep the format of the matrix undefined, we were also able to create functors for both dense and sparse matrices.
+
+In Rust for example, defining a sparse matrix would mean to define a whole new separate struct with no correlation to the dense matrix struct. A general \verb|Matrix| trait would be difficult to define, as Rust's dynamic dispatch system\footnote{Dynamic dispatch is when the choice, which overloaded function is picked, happens at runtime and not compile time. In Rust this is done by using \textit{trait objects} and the \verb|dyn| keyword.} is rather verbose to work with (not to mention it's not idiomatic), and there is no way to define the structure of a struct from within a trait.
+
+As such, it shall be mentioned that Ocaml modules aren't a direct equivalent to the notion of "Ocaml's type classes". In reality, Ocaml modules sit at a higher level. As the name suggest, whereas type classes and traits are essentially interface definitions for singular types, modules in Ocaml can include various types and define how they interact with one another. In that sense, modules in Ocaml sit on the same level of Rust's own modules. It's just with the existence of abstract module signatures as well as functors, that Ocaml modules are also found in the realm of abstract interfaces.
+
+% ---- Bibliography ----
+%\newpage{}
+\bibliography{biblio}
+
+% ---- Appendices ----
+% \newpage
+% \appendix
+% \input{appendix.tex}
+
+\end{document}
