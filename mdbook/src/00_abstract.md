@@ -1,1 +1,3 @@
 # Abstract
+
+There are many ways to abstract functionality in programming languages. One important idea of abstraction is the notion of interfaces defining functionality for abstract types. Modern languages offer different approaches to such interfaces, some of which with a focus on data abstraction, while others with a focus on supporting ad-hoc polymorphism. We will first see the differences between parametric and ad-hoc polymorphism. Afterwards we will look at three interfacing approaches: Haskell type classes, the type class-inspired Rust traits and Ocaml's ML-inherited module system, and find them to have many similarities.
