@@ -32,12 +32,11 @@ instance Eq Int where
 \end{minted}
 assuming \verb|eqInt| is the equality function for integers.
 
-We could also create an instance for a different type, for example for \verb|Float|:
+Similarly, an instance of the \verb|Eq| type class can be created for the specific type \verb|Float|:
 \begin{minted}{haskell}
 instance Eq Float where
   (==) x y = eqFloat x y
 \end{minted}
-again, assuming \verb|eqFloat| is the equality function for floats.
 
 When we now try to use the \verb|(==)| function with parameters of types other than \verb|Int| or \verb|Float|, we will get a compile time error.
 
@@ -154,4 +153,4 @@ instance Add a b => Add (Matrix a) (Matrix b) where
 \end{minted}
 The first line can be read as "implement \verb|Add| for two matrices whose elements' types implement \verb|Add|". The second and third lines mean "the output of such an addition shall be another matrix whose elements' type is that of the output of adding the elements of the original two matrices together".
 
-To make this clear again: This is \textbf{not} how Haskell typically implements overloaded addition. Instead, Haskell defines a \verb|Num| type class that defines multiple operators, such as \verb|(+)| and the unary negate, and only defines those operations on two elements \textit{of the same type}. What we did here was merely to showcase the strength of an overloading system that allows for multiple parameters and associated types, and how operator overloading could be solved using these.
+This is \textbf{not} how Haskell typically implements overloaded addition. Instead, Haskell defines a \verb|Num| type class that defines multiple operators, such as \verb|(+)| and the unary negate, and only defines those operations on two elements \textit{of the same type}. What we did here was merely to showcase the strength of an overloading system that allows for multiple parameters and associated types, and how operator overloading could be solved using these.

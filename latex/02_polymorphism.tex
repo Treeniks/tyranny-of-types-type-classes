@@ -18,9 +18,9 @@ val length : 'a list -> int
 \end{minted}
 with the type parameter \verb|'a|. The important thing to understanding parametric polymorphism is that the actual value of \verb|'a| is irrelevant for how this function operates. This means that there must not be more than one implementation of \verb|length| for different \verb|'a|s, there is exactly one and it can be called for all types inserted into \verb|'a| with the same semantics.
 
-The reason this works is that we don't ever infer what the type of \verb|x| inside the function should be. And this also makes logical sense: To determine the length of a list, we don't care about the types of the contents of that list, and we don't need to know it to determine its length.
+The reason this works is that we don't ever infer what the type of \verb|x| inside the function should be. To determine the length of a list, the type of the list's elements is irrelevant.
 
-Mind you that the compiler might still be free to compile different versions of this function, depending on what types the function is called with. Depending on how lists are implemented, small parts of the list might be laid out in memory as arrays~\cite{functional-lists}, which means that the act of getting the next value in the list requires the compiler to know the size of \verb|'a|. However, this is hidden from the programmer and not relevant for the language definition.
+The compiler might still be free to compile different versions of this function, depending on what types the function is called with. Depending on how lists are implemented, small parts of the list might be laid out in memory as arrays~\cite{functional-lists}, which means that the act of getting the next value in the list requires the compiler to know the size of \verb|'a|. However, this is hidden from the programmer and not relevant for the language definition.
 
 The problem with parametric polymorphism is that it is inherently useless for functions that should have different implementations for different types, and potentially no implementation for some types. The obvious example for this case would be operator overloading, such as a \verb|(+)| or a \verb|(=)| function that does addition or checks for equality respectively.
 

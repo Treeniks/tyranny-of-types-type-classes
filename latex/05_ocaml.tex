@@ -13,9 +13,9 @@ module DenseMatrix =
     let add a b = (* ... *)
   end
 \end{minted}
-Obviously this Matrix module does not define all functions one would want in such a module, but we will leave out other functions for now.
+This Matrix module could be further extended with other functions, but for our example this minimal version suffices.
 
-Ocaml modules will also have an associated \textit{signature}. The signature includes information about the function names and types, the names of the defined types and optionally what those types are defined to. The reason why this latter part is optional is to have the ability to hide implementation details from the user of the module.
+Ocaml modules will also have an associated \textit{signature}. The signature includes information about the function names and types, the names of the defined types and optionally what those types are defined to. This latter part is optional to have the ability to hide implementation details from the user of the module.
 
 Ocaml can infer the signature of our \verb|DenseMatrix| module, but let's say we want to hide the fact that our Matrix uses an \verb|elem list list|, so we'll define the signature ourselves:
 \begin{minted}{ocaml}
@@ -103,7 +103,7 @@ Because we left out the implementations of these functions, it might not be imme
 
 \subsubsection{Defining addition as a module}
 
-Functors, as the name would suggest, are something rather similar to functions. In a sense, they can be seen as compile-time functions that take modules as arguments, and return other modules. They can also be seen as a sort of macro for module definitions.
+Functors, as the name would suggest, are something similar to functions. In a sense, they can be seen as compile-time functions that take modules as arguments, and return other modules. They can also be seen as a sort of macro for module definitions.
 
 A functor in our case could define the implementation of an entire \verb|DenseMatrix| for any type \verb|elem| that implements an addition. However, we don't have a concept of "implements an addition" in Ocaml yet. So let's define a module signature that conveys the concept of addition:
 \begin{minted}{ocaml}

@@ -98,7 +98,7 @@ where
         .unwrap()
 }
 \end{minted}
-Inside the \verb|cheapest| function, we use the \verb|cost| method on elements of the slice. To be able to do so, we must tell the compiler that elements of the slice implement such function, which we do by giving the \verb|cheapest| function a \verb|where| clause. Inside a \verb|where| clause, we can define as many trait bounds as we want which are of the form \verb|type: bound|. In this case, we are adding a bound \verb|Cost| for the generic \verb|T| inside the \verb|where| clause, meaning that the function \verb|cheapest| shall only exist for \verb|T|s that have a \verb|Cost| implementation.
+Inside the \verb|cheapest| function, we use the \verb|cost| method on elements of the slice. To do so, we must tell the compiler that elements of the slice implement such function, which is done by giving the \verb|cheapest| function a \verb|where| clause. Inside a \verb|where| clause, we can define as many trait bounds as we want which are of the form \verb|type: bound|. In this case, we are adding a bound \verb|Cost| for the generic \verb|T| inside the \verb|where| clause, meaning that the function \verb|cheapest| shall only exist for \verb|T|s that have a \verb|Cost| implementation.
 
 \subsubsection{Creating implementations from other implementations}
 

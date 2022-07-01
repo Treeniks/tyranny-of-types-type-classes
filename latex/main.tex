@@ -38,7 +38,7 @@
 % ---- Abstract ----
 \begin{abstract}
 %%%%%%%% Write your abstract %%%%%%%%%%%%%%%
-There are many ways to abstract functionality in programming languages. One important idea of abstraction is the notion of interfaces defining functionality for abstract types. Modern languages offer different approaches to such interfaces, some of which with a focus on data abstraction, while others with a focus on supporting ad-hoc polymorphism. We will first see the differences between parametric and ad-hoc polymorphism. Afterwards we will look at three interfacing approaches: Haskell type classes, the type class-inspired Rust traits and Ocaml's ML-inherited module system, and find them to have many similarities.
+There are many ways to abstract functionality in programming languages. One important idea of abstraction is the notion of interfaces defining functionality for abstract types. Modern languages offer different approaches to such interfaces, some focus on data abstraction, while others focus on supporting ad-hoc polymorphism. We will first see the differences between parametric and ad-hoc polymorphism. Afterwards we will look at three interfacing approaches: Haskell type classes, the type class-inspired Rust traits and Ocaml's ML-inherited module system, and find them to have many similarities.
 \end{abstract}
 \maketitle
 
@@ -47,13 +47,9 @@ There are many ways to abstract functionality in programming languages. One impo
 
 \section{Introduction}
 
-Programmers are lazy. That is why they tend to spend a lot of time coming up with and developing programming language concepts that allow them to write less code for the same things, and then let the compiler do the rest of the work.
+Programmers are lazy. That is why they tend to spend a lot of time coming up with and developing programming language concepts that allow them to write less code for the same results, and then let the compiler do the rest of the work. Few of those convey that idea better than the concept of polymorphism, a term describing the reusing of functions and methods for varying data types.
 
-Few things convey that idea better than the concept of polymorphism, a term describing the reusing of functions and methods for varying data types.
-
-There is many different forms of polymorphism, and in this paper we will briefly look at two of them: Parametric and ad-hoc polymorphism.
-
-Ad-hoc polymorphism is primarily used by object oriented programming languages, whereas parametric polymorphism is more well known by its use in functional languages. However, as languages have matured and gained features, most modern languages have their own concepts for both.
+There is many different forms of polymorphism, and in this paper we will briefly look at two of them: Parametric and ad-hoc polymorphism. Ad-hoc polymorphism is primarily used by object oriented programming languages, whereas parametric polymorphism is more well known by its use in functional languages. However, as languages have matured and gained features, most modern languages have their own concepts for both.
 
 Afterwards we will look at one particular implementation of ad-hoc polymorphism: Type Classes. We will find that the concept of type classes also offers a way to define an interface on custom data types and thus compare them to other language interface concepts, in particular Rust Traits and Ocaml Modules.
 
