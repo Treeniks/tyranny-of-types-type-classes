@@ -32,7 +32,7 @@ val (=) : 'a -> 'a -> bool
 and the implementation of this function is handled by the compiler and runtime system. Because this is the type of the \verb|(=)| function, OCaml will not give you a compile time error if you happen to try to check two functions for equality, even though functions can not generally be checked for equality. OCaml can only throw an exception at runtime in such cases.
 % CITATION?
 
-\subsection{Ad-hoc Polymorphism}
+\subsection{Ad-hoc Polymorphism}\label{ad-hoc-polymorphism}
 
 Ad-hoc polymorphism is the idea of overloading functions for different types~\cite[Chapter~23.2]{pierce-types}. This means one can have one implementation for a specific set of types, but potentially a different implementation, including none, for a different set of types. This fixes the aforementioned problem of parametric polymorphism. Operator overloading in particular is a common use case for ad-hoc polymorphism. It allows to have different implementations of \verb|(+)|, both for \verb|int -> int -> int| and \verb|float -> float -> float|.
 

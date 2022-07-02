@@ -25,7 +25,7 @@ impl<T> [T] {
 
 \subsection{Traits: Rust's Type Classes}
 
-In their simplest form, traits are the exact same concept as type classes, they simply define a named set of operations. This is because Rust's traits are heavily inspired by type classes~\cite{rust-reference}. The main difference between the two being a slight change in nomenclature. Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the \verb|a| in \verb|class Eq a|, in Rust this type is implicitly called \verb|Self|. \verb|Self| is not the same as \verb|self|, \verb|self| is a value and \verb|Self| is \verb|self|'s type.
+In their simplest form, traits are the exact same concept as type classes, they simply define a named set of operations. This is because Rust's traits are heavily inspired by type classes~\cite[Chapter~20.2]{rust-reference}. The main difference between the two being a slight change in nomenclature. Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the \verb|a| in \verb|class Eq a|, in Rust this type is implicitly called \verb|Self|. \verb|Self| is not the same as \verb|self|, \verb|self| is a value and \verb|Self| is \verb|self|'s type.
 
 To see how traits work, we will implement the same equality type class from \autoref{haskell-type-classes}:\footnote{Rust's STL also defines an \verb|Eq| trait, however this is actually a marker trait without any function declarations. Instead, what we are doing here is more similar to the STL's \verb|PartialEq| trait (although that one also has a default implementation for not equals).}
 \begin{minted}{rust}
@@ -121,11 +121,9 @@ impl Add<f32, f32> for usize {
 If we were to call \verb|1_usize.add(3.2_f32)|, we would have to specify \textit{which} \verb|add| function we want to call:\footnote{This uses Rust's Fully Qualified Syntax for Disambiguation~\cite{rust-book} and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: \verb|let k: f32 = 1_usize.add(3.2_f32);|.}
 \mint{rust}|<usize as Add<f32, f32>>::add(1_usize, 3.2_f32)|
 
-\subsubsection{Associated types}
+\subsubsection{Associated types}\label{rust-associated-types}
 
-Once again, Rust also defines the notion of associated types, which also works very similar to Haskell.
-
-Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
+Once again, Rust also defines the notion of associated types, which also works very similar to Haskell. Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
 
 First we must edit the \verb|Add| trait's definition. We will add an associated type called \verb|Output| and we will also change the name of the generic \verb|T| to \verb|Rhs| and default it to \verb|Self|:\footnote{This is actually how the real world \verb|Add| trait in Rust's STL is defined, with the exception of access modifiers.}
 \begin{minted}{rust}
