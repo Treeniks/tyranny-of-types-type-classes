@@ -13,9 +13,7 @@ fn len<T>(slice: &[T]) -> usize {
 }
 \end{minted}
 \footnote{Pay no mind to the abundance of ampersands inside this Rust code, it is not of importance for this topic.}
-We will leave out the implementation of the length function here, because it requires knowledge of the underlying layout of slices. The function \href{https://doc.rust-lang.org/std/primitive.slice.html#method.len}{is given by Rust's STL}.
-
-We will also slightly alter the declaration of this function. As it stands, \verb|len| is declared as a standalone function, but in the real Rust STL it is actually defined as a member function on the slice primitive. To implement member functions on types, Rust uses the \verb|impl| keyword. Note that we also must declare the generic \verb|T| with the \verb|impl| keyword, as the type we are implementing on itself uses the generic:
+We will leave out the implementation of the length function here, because it requires knowledge of the underlying layout of slices. The function is given by Rust's STL~\cite{rust-len}. We will also slightly alter the declaration of this function. As it stands, \verb|len| is declared as a standalone function, but in the real Rust STL it is actually defined as a member function on the slice primitive. To implement member functions on types, Rust uses the \verb|impl| keyword. Note that we also must declare the generic \verb|T| with the \verb|impl| keyword, as the type we are implementing on itself uses the generic:
 \begin{minted}{rust}
 impl<T> [T] {
     fn len(&self) -> usize {
@@ -27,27 +25,23 @@ impl<T> [T] {
 
 \subsection{Traits: Rust's Type Classes}
 
-Rust's traits are heavily inspired by type classes~\cite{rust-reference} and, in their simplest form, will look quite similar. As we did with Haskell, we will first define an equality trait:
+In their simplest form, traits are the exact same concept as type classes, they simply define a named set of operations. This is because Rust's traits are heavily inspired by type classes~\cite{rust-reference}. The main difference between the two being a slight change in nomenclature. Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the \verb|a| in \verb|class Eq a|, in Rust this type is implicitly called \verb|Self|. \verb|Self| is not the same as \verb|self|, \verb|self| is a value and \verb|Self| is \verb|self|'s type.
+
+To see how traits work, we will implement the same equality type class from \autoref{haskell-type-classes}:
 \footnote{Rust's STL also defines an \verb|Eq| trait, however this is actually a marker trait without any function declarations. Instead, what we are doing here is more similar to the STL's \verb|PartialEq| trait (although that one also has a default implementation for not equals).}
 \begin{minted}{rust}
-trait Eq {
-    fn eq(&self, other: &Self) -> bool;
-}
+trait Eq { fn eq(&self, other: &Self) -> bool; }
 \end{minted}
-
-Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the \verb|a| in \verb|class Eq a|, in Rust this type is implicitly called \verb|Self|.
-
 What we called a type class instance in Haskell we call a trait implementation in Rust, because doing so extends the previously used \verb|impl| keyword:
 \begin{minted}{rust}
 impl Eq for usize {
     fn eq(&self, other: &Self) -> bool {
+        // equality function for values of type usize
         eq_usize(self, other)
     }
 }
 \end{minted}
-assuming \verb|eq_usize| is the equality function for \verb|usize|s.
-
-We can of course also implement the trait on other types:
+We can of course also implement the trait on other types, such as Rust's floating point primitive \verb|f32|:
 \begin{minted}{rust}
 impl Eq for f32 {
     fn eq(&self, other: &Self) -> bool {
@@ -55,27 +49,18 @@ impl Eq for f32 {
     }
 }
 \end{minted}
-where \verb|f32| is a floating point primitive of Rust and \verb|eq_f32| is the equality function for that primitive.
 
-Like with Haskell, as Rust is also statically typed, calling \verb|eq| on either \verb|usize| or \verb|f32| types will automatically pick the correct function at compile time, and calling it on any other type will give us a compile time error.
+Like with Haskell, Rust is also statically typed, and therefore calling \verb|eq| on either \verb|usize| or \verb|f32| types will automatically pick the correct function at compile time, and calling it on any other type will give us a compile time error.
 
 \subsubsection{Trait bounds: Rust's type constraints}
 
-Trait bounds allow us to tell the Rust compiler that a generic function only makes sense, if those generic types implement a specific trait. This is the exact same as Haskell's type constraints. As such, we will look at the same \verb|Cost| example.
-
-First we define the \verb|Cost| trait itself:
+Trait bounds allow us to tell the Rust compiler that a generic function only makes sense, if those generic types implement a specific trait. This is the exact same as Haskell's type constraints discussed in \autoref{constraints}. We will also use the same \verb|Cost| example and thus first define a \verb|Cost| trait:
 \begin{minted}{rust}
-trait Cost {
-    fn cost(&self) -> usize;
-}
+trait Cost { fn cost(&self) -> usize; }
 \end{minted}
 Then we will implement the trait for some custom data type, which will be an enum with two variants with the exact same semantics as the custom data type we used for the Haskell example:
 \begin{minted}{rust}
-enum Custom {
-    Cheap,
-    Expensive,
-}
-
+enum Custom { Cheap, Expensive }
 impl Cost for Custom {
     fn cost(&self) -> usize {
         match self {
@@ -87,13 +72,9 @@ impl Cost for Custom {
 \end{minted}
 And now we again define a \verb|cheapest| function, however this time we define it on slices instead of lists:
 \begin{minted}{rust}
-fn cheapest<T>(elements: &[T]) -> &T
-where
-    T: Cost,
-{
+fn cheapest<T>(elements: &[T]) -> &T where T: Cost {
     // the exact implementation is not relevant
-    elements
-        .iter()
+    elements.iter()
         .min_by(|x, y| x.cost().cmp(&y.cost()))
         .unwrap()
 }
@@ -104,65 +85,58 @@ Inside the \verb|cheapest| function, we use the \verb|cost| method on elements o
 
 As with Haskell, we can create implementations for generic types, where the generics are constrained, i.e. have trait bounds. For this, we will again implement \verb|Cost| for slices where the slices' elements implement \verb|Cost|:
 \begin{minted}{rust}
-impl<T> Cost for [T]
-where
-    T: Cost,
-{
+impl<T> Cost for [T] where T: Cost {
     fn cost(&self) -> usize {
         self.iter().map(|x| x.cost()).sum()
     }
 }
 \end{minted}
-Mind you, Rust only allows us to do so if \textit{either} the type we're implementing on \textit{or} the trait is not foreign, i.e. local to the current crate (which is Rust's version of a package)~\cite{rust-book}. This is done to prevent certain situations that could cause ambiguities when selecting a method.
+% Rust only allows us to do so if \textit{either} the type we're implementing on \textit{or} the trait is not foreign, i.e. local to the current crate (which is Rust's version of a package)~\cite{rust-book}. This is done to prevent certain situations that could cause ambiguities when selecting a method.
+% TODO the above is not really necessary is it?
 
 \subsubsection{Generic traits: Rust's multi-parameter type classes}
 
 So far we faced a similar problem we did in Haskell: If we wanted to define an \verb|Add| trait with an \verb|add| function, that function would have to take the same types for both parameters. This limitation can be removed in Rust by using generics inside the trait's definition:
 \begin{minted}{rust}
-trait Add<T> {
-    fn add(self, rhs: T) -> Self;
-}
+trait Add<T> { fn add(self, rhs: T) -> Self; }
 \end{minted}
 Unlike in Haskell, we did not have to enable a language extension first, as Rust supports this out of the box.
 
-As before, the output is set to be of the same type as the left hand side, which we can fix by adding a second generic:
+As in \autoref{haskell-add}, the output is set to be of the same type as the left hand side, which we can fix by adding a second generic:
 \begin{minted}{rust}
-trait Add<T, U> {
-    fn add(self, rhs: T) -> U;
-}
+trait Add<T, U> { fn add(self, rhs: T) -> U; }
 \end{minted}
-Which, again as before, poses the issue that an addition between two types does not have a well defined output type. We can again implement addition between integers and floating point numbers with differing outputs:
+Which again poses the issue that an addition between two types does not have a well defined output type. We can implement addition between integers and floating point numbers with differing outputs:
 \begin{minted}{rust}
 impl Add<f32, usize> for usize {
     fn add(self, rhs: f32) -> usize {
         // ...
     }
 }
-
 impl Add<f32, f32> for usize {
     fn add(self, rhs: f32) -> f32 {
         // ...
     }
 }
 \end{minted}
-If we were to now call \verb|1_usize.add(3.2_f32)|, we would have to specify \textit{which} \verb|add| function we want to call:
+If we were to call \verb|1_usize.add(3.2_f32)|, we would have to specify \textit{which} \verb|add| function we want to call:
 \footnote{This uses Rust's Fully Qualified Syntax for Disambiguation~\cite{rust-book} and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: \verb|let k: f32 = 1_usize.add(3.2_f32);|.}
 \mint{rust}|<usize as Add<f32, f32>>::add(1_usize, 3.2_f32)|
 
 \subsubsection{Associated types}
 
-Once again, Rust also defines the notion of associated types, which also work very similar to Haskell.
+Once again, Rust also defines the notion of associated types, which also works very similar to Haskell.
 
 Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
 
 First we must edit the \verb|Add| trait's definition. We will add an associated type called \verb|Output| and while we're at it, we will also change the name of the generic \verb|T| to \verb|Rhs| and default it to \verb|Self|:
+\footnote{This is actually how the real world \verb|Add| trait in Rust's STL is defined, with the exception of access modifiers.}
 \begin{minted}{rust}
 trait Add<Rhs = Self> {
     type Output;
     fn add(self, rhs: Rhs) -> Self::Output;
 }
 \end{minted}
-\footnote{This is actually how the real world \verb|Add| trait in Rust's STL is defined, with the exception of access modifiers.}
 The type \verb|Output| is now fixed for a given \verb|Self| and \verb|Rhs| type. Notice how we didn't call the associated type \verb|AddOutput| like we did in the Haskell example. The reason being that, in Rust, the associated type is in the namespace of the surrounding trait. That is why, to use the associated type as the output type of the \verb|add| function, we need to qualify it as \verb|Self::Output| which implicitly translates to \verb|<Self as Add<Rhs>>::Output| inside this trait. That way, we can reuse the \verb|Output| name for all operations.
 
 Implementing the \verb|Add| trait now means one also has to define the \verb|Output| associated type, which we will set to be a float like we did with Haskell:
@@ -174,48 +148,31 @@ impl Add<f32> for usize {
     }
 }
 \end{minted}
-If we were now to add another implementation with \\ \verb|type Output = usize|, the Rust compiler would give us an error.
+If we were to add another implementation with \\ \verb|type Output = usize|, the Rust compiler would detect the ambiguity and throw an error.
 
 \subsubsection{A matrix example}
 
-Rust generics can also be used for structs, which are Rust's custom data types. To mirror the matrix example from Haskell, let us assume we have a generic matrix struct \verb|Matrix<T>| where the matrix's elements are of type \verb|T|.
+Rust generics can also be used for structs, which are Rust's custom data types. To mirror the matrix example from \autoref{haskell-matrix}, let us assume we have a generic matrix struct \verb|Matrix<T>| where the matrix's elements are of type \verb|T|.
 
-As Rust's syntax gets more complicated, especially if one is not used to it, we will do it step by step this time. First, we will define the addition over matrices with the same \verb|T|:
+First, we will define the addition over matrices with the same \verb|T|:
 \begin{minted}{rust}
-impl<T> Add for Matrix<T>
-where
-    T: Add<Output = T>,
-{
+impl<T> Add for Matrix<T> where T: Add<Output = T> {
     type Output = Matrix<T>;
     fn add(self, rhs: Matrix<T>) -> Self::Output {
         // ...
     }
 }
 \end{minted}
-Note that we do not have to specify the type of the right hand side, as it defaults to \verb|Self|, which is \verb|Matrix<T>| in this case. Note also that we had to bound \verb|T| to be addable with itself where the result is again a \verb|T|. The \verb|where| clause can thus be read as "implement only for types \verb|T| that are addable with itself and where such addition returns a \verb|T|".
+Note that we do not have to specify the type of the right hand side, as it defaults to \verb|Self|, which is \verb|Matrix<T>| in this case. Note also that we had to bound \verb|T| to be addable with itself where the result is again a \verb|T|. The \verb|where| clause can thus be read as "implement only for types \verb|T| that are addable with itself and where such an addition returns a \verb|T|".
 
-We can first make the Output type of the addition of two \verb|T|s variable, by giving the output type the name \verb|Tout|:
+We extend this implementation for additions where the element type of the right hand side matrix (which we will call \verb|U|) is different to the element type of the left hand side matrix (\verb|T|). We also make the Output type of the addition of a \verb|T| and \verb|U| variable, by giving the output type the name \verb|O|:
 \begin{minted}{rust}
-impl<T, Tout> Add for Matrix<T>
+impl<T, U, O> Add<Matrix<U>> for Matrix<T>
 where
-    T: Add<Output = Tout>,
+    T: Add<U, Output = O>,
 {
-    type Output = Matrix<Tout>;
-    fn add(self, rhs: Matrix<T>) -> Self::Output {
-        // ...
-    }
-}
-\end{minted}
-This might seem a bit weird, but if we're trying to make our matrix as generic as possible, we include types whose addition result in a new type.
-
-Now let us extend this implementation for additions where the element type of the right hand side matrix is different to the element type of the left hand side matrix:
-\begin{minted}{rust}
-impl<Tlhs, Trhs, Tout> Add<Matrix<Trhs>> for Matrix<Tlhs>
-where
-    Tlhs: Add<Trhs, Output = Tout>,
-{
-    type Output = Matrix<Tout>;
-    fn add(self, rhs: Matrix<Trhs>) -> Self::Output {
+    type Output = Matrix<O>;
+    fn add(self, rhs: Matrix<U>) -> Self::Output {
         // ...
     }
 }
