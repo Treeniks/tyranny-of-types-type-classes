@@ -1,6 +1,9 @@
 build:
     latexmk -pdf -silent -shell-escape main
 
+watch:
+    latexmk -pdf -pvc -silent -shell-escape main
+
 clean:
     rm -f *.aux *.bbl *.blg *.dvi *.fdb_latexmk *.fls *.log *.out *.pdf *.pyg *.xcp *~
     rm -rf _minted-main
