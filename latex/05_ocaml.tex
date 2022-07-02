@@ -1,8 +1,8 @@
 \section{OCaml}
 
-As already noted before, OCaml supports parametric polymorphism as one would expect. However the language has no concept of ad-hoc polymorhism, i.e. there is no way to overload functions. Nontheless, OCaml inherits ML's powerful module system which still allows the language to express and convey complicated relations between types.
+As already noted before, OCaml supports parametric polymorphism. However the language has no concept of ad-hoc polymorhism, i.e. there is no way to overload functions. Nontheless, OCaml inherits ML's powerful module system which still allows the language to express and convey complicated relations between types.
 
-At first glance, OCaml's module system might seem like a way to define modules, not interfaces. However these concepts aren't actually all that different in the end. Interfaces define a set of functions over either one or, depending on the language, multiple types. Modules do essentially the same, they are also a collection of types and functions. Let's say we want to define a module for working with matrices of integers, in OCaml one could write something like this:
+At first glance, a module system might not seem related to interface systems. However these concepts aren't all that different. Interfaces define a set of functions over one or, in some languages, multiple types. Modules are quite similar, they are a collection of types and functions. For example, to define a module for working with matrices of integers, in OCaml one could write this:
 \begin{minted}{ocaml}
 module DenseMatrix =
   struct
@@ -22,7 +22,6 @@ module type Matrix =
     type t
     val add : t -> t -> t
   end
-
 module DenseMatrix : Matrix =
   struct
     type elem = int
@@ -30,7 +29,7 @@ module DenseMatrix : Matrix =
     let add a b = (* ... *)
   end
 \end{minted}
-What this also allows us to do is create a seperate \verb|SparseMatrix| module with the same signature:
+This also allows us to create a separate \verb|SparseMatrix| module with the same signature:
 \begin{minted}{ocaml}
 module SparseMatrix : Matrix =
   struct
@@ -41,7 +40,7 @@ module SparseMatrix : Matrix =
 \end{minted}
 Thus, from the perspective of interfaces, module signatures can be seen as type classes and modules as instances~\cite{modular-type-classes}.
 
-The main difference to type classes (and by extension the reason why OCaml modules are not ad-hoc polymorphic) is that the \verb|add| function will be namespaced inside each module we defined. If we wanted to use the \verb|DenseMatrix|'s add function, we would have to specify it as \verb|DenseMatrix.add|. It is also possible to use the \verb|open| keyword to bring the entire module into the current scope, however this will only ever work for \textit{one} of these modules at a time. As such there is no logic behind automatically choosing the correct \verb|add| function for a given context, which is what ad-hoc polymorphism and overloading is about. Instead, the caller must specify an exact function they want to call. In contrast to this, for Haskell, the implemented functions in a type class were available independently from specific instances, i.e. in OCaml's terms, the module signature's defined functions could be used without specifying the exact module.
+The main difference to type classes (and by extension the reason why OCaml modules are not ad-hoc polymorphic) is that the \verb|add| function will be namespaced inside each module we defined. If we wanted to use the \verb|DenseMatrix|'s add function, we would have to specify it as \verb|DenseMatrix.add|. There is no logic behind automatically choosing the correct \verb|add| function for a given context, which is what ad-hoc polymorphism and overloading is about. Instead, the caller must specify an exact function they want to call. In contrast to this, for Haskell, the implemented functions in a type class were available independently from specific instances, i.e. in OCaml's terms, the module signature's defined functions could be used without specifying the exact module.
 
 \subsection{Functors}
 
@@ -99,7 +98,7 @@ Because we left out the implementations of these functions, it might not be imme
 
 Functors, as the name would suggest, are something similar to functions. In a sense, they can be seen as compile-time functions that take modules as arguments, and return other modules. They can also be seen as a sort of macro for module definitions.
 
-A functor in our case could define the implementation of an entire \verb|DenseMatrix| for any type \verb|elem| that implements an addition. However, we don't have a concept of "implements an addition" in OCaml yet. So let's define a module signature that conveys the concept of addition:
+A functor in our case could define the implementation of an entire \verb|DenseMatrix| for any type \verb|elem| that implements an addition. Thus we must first define what "implements an addition" means, which we do by defining a module signature:
 \begin{minted}{ocaml}
 module type Addable =
   sig
@@ -116,13 +115,14 @@ module type Matrix =
     include Addable with type t := t
   end
 \end{minted}
-What \verb|include| does in OCaml is to copy all definitions of another module/signature into the current module/signature, making our matrices addable in this case. The reason why we don't use \verb|Addable|'s \verb|type t| but instead our own is because we might want to add signatures for other operators later on which should all share the same \verb|t|.
+The \verb|include| keyword in OCaml copies all definitions of another module/signature into the current module/signature, making our matrices addable in this case. The reason why we don't use \verb|Addable|'s \verb|type t| but instead our own is because we might want to add signatures for other operators later on which should all share the same \verb|t|.
 
 \subsubsection{Functors in action}
 
 \autoref{ocaml-matrix-functor} shows how we can define a \verb|DenseMatrix| functor, that takes in an \verb|Addable| module as an argument called \verb|D|, and gives back a \verb|Matrix| module by implementing a dense matrix with elements of type \verb|D.t|. We can do the same for sparse matrices, but we will skip this here.
 
 So far we can't use the \verb|DenseMatrix| functor, as we have yet to create a module with the \verb|Addable| signature, so let's do so for \verb|int|s:
+\newpage
 \begin{minted}{ocaml}
 module IntAddable : (Addable with type t = int) =
   struct
@@ -130,19 +130,8 @@ module IntAddable : (Addable with type t = int) =
     let add a b = a + b
   end
 \end{minted}
-
-Now we can finally create a \verb|DenseIntMatrix| module by calling the \verb|DenseMatrix| functor on our \verb|IntAddable| module:
+Now we can create a \verb|DenseIntMatrix| module by calling the \\ \verb|DenseMatrix| functor on our \verb|IntAddable| module:
 \begin{minted}{ocaml}
 module DenseIntMatrix = DenseMatrix IntAddable
 \end{minted}
-
-We can now easily create a DenseMatrix for floating point values as well, simply by creating an \verb|Addable| module and calling the \verb|DenseMatrix| functor on it:
-\begin{minted}{ocaml}
-module FloatAddable : (Addable with type t = float) =
-  struct
-    type t = float
-    let add a b = a +. b
-  end
-
-module DenseFloatMatrix = DenseMatrix FloatAddable
-\end{minted}
+A \verb|DenseMatrix| for floating point values can easily be created as well, simply by creating a \verb|FloatAddable| module and calling the \verb|DenseMatrix| functor on it.

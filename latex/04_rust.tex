@@ -1,19 +1,19 @@
 \section{Rust}
 
-Rust is known to be a language that combines many different features of many different programming languages into one language, with the goal of keeping the good and eliminating the bad with each addition.
+Rust is known to be a language that combines different features of different programming languages into one language, with the goal of only keeping whatever works best and eliminating whatever doesn't.
 When it comes to polymorphism, Rust combines the concept of type classes with generics, the latter of which is usually seen in object oriented languages like Java, C\# and C++.
 
 \subsection{Generics: Rust's Parametric Polymorphism}
 
-Generics, in their simplest form, are a form of parametric polymorphism. As such, the length function on slices can be defined with a generic which we will name \verb|T|.
-\footnote{Because Rust only implements many ideas from functional languages, but is in itself a C-like imperative language and thus not purely functional, the terminology used for similar things will be slightly different, so will the syntax. In this case for example, we use a slice in place of a list. A slice in Rust is a reference to a specific area inside an array (or similar), and it can also be a reference to the entire array itself. The type \verb|usize| is one of Rust's unsigned integer types and will be used as such.}
+Generics, in their simplest form, are a form of parametric polymorphism. As such, the length function on slices can be defined with a generic which we will name \verb|T|.\footnote{Because Rust only implements many ideas from functional languages, but is in itself a C-like imperative language, the terminology used for similar things will be slightly different, so will the syntax. In this case, we use a slice in place of a list. A slice in Rust is a reference to a specific area inside an array (or similar), or to the entire array itself. The type \verb|usize| is one of Rust's unsigned integer types. Also, pay no mind to ampersands inside this paper's Rust code, as it is not of importance for this topic.}
 \begin{minted}{rust}
 fn len<T>(slice: &[T]) -> usize {
     // calculate and return length
 }
 \end{minted}
-\footnote{Pay no mind to the abundance of ampersands inside this Rust code, it is not of importance for this topic.}
-We will leave out the implementation of the length function here, because it requires knowledge of the underlying layout of slices. The function is given by Rust's STL~\cite{rust-len}. We will also slightly alter the declaration of this function. As it stands, \verb|len| is declared as a standalone function, but in the real Rust STL it is actually defined as a member function on the slice primitive. To implement member functions on types, Rust uses the \verb|impl| keyword. Note that we also must declare the generic \verb|T| with the \verb|impl| keyword, as the type we are implementing on itself uses the generic:
+We will leave out the implementation of the length function here, because it requires knowledge of the underlying layout of slices. The function is given by Rust's STL~\cite{rust-len}.
+
+We will also slightly alter the declaration of this function. As it stands, \verb|len| is declared as a standalone function, but in the real Rust STL it is actually defined as a member function on the slice primitive. To implement member functions on types, Rust uses the \verb|impl| keyword. Note that we also must declare the generic \verb|T| with the \verb|impl| keyword, as the type we are implementing on itself uses the generic:
 \begin{minted}{rust}
 impl<T> [T] {
     fn len(&self) -> usize {
@@ -27,8 +27,7 @@ impl<T> [T] {
 
 In their simplest form, traits are the exact same concept as type classes, they simply define a named set of operations. This is because Rust's traits are heavily inspired by type classes~\cite{rust-reference}. The main difference between the two being a slight change in nomenclature. Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the \verb|a| in \verb|class Eq a|, in Rust this type is implicitly called \verb|Self|. \verb|Self| is not the same as \verb|self|, \verb|self| is a value and \verb|Self| is \verb|self|'s type.
 
-To see how traits work, we will implement the same equality type class from \autoref{haskell-type-classes}:
-\footnote{Rust's STL also defines an \verb|Eq| trait, however this is actually a marker trait without any function declarations. Instead, what we are doing here is more similar to the STL's \verb|PartialEq| trait (although that one also has a default implementation for not equals).}
+To see how traits work, we will implement the same equality type class from \autoref{haskell-type-classes}:\footnote{Rust's STL also defines an \verb|Eq| trait, however this is actually a marker trait without any function declarations. Instead, what we are doing here is more similar to the STL's \verb|PartialEq| trait (although that one also has a default implementation for not equals).}
 \begin{minted}{rust}
 trait Eq { fn eq(&self, other: &Self) -> bool; }
 \end{minted}
@@ -119,8 +118,7 @@ impl Add<f32, f32> for usize {
     }
 }
 \end{minted}
-If we were to call \verb|1_usize.add(3.2_f32)|, we would have to specify \textit{which} \verb|add| function we want to call:
-\footnote{This uses Rust's Fully Qualified Syntax for Disambiguation~\cite{rust-book} and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: \verb|let k: f32 = 1_usize.add(3.2_f32);|.}
+If we were to call \verb|1_usize.add(3.2_f32)|, we would have to specify \textit{which} \verb|add| function we want to call:\footnote{This uses Rust's Fully Qualified Syntax for Disambiguation~\cite{rust-book} and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: \verb|let k: f32 = 1_usize.add(3.2_f32);|.}
 \mint{rust}|<usize as Add<f32, f32>>::add(1_usize, 3.2_f32)|
 
 \subsubsection{Associated types}
@@ -129,8 +127,7 @@ Once again, Rust also defines the notion of associated types, which also works v
 
 Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
 
-First we must edit the \verb|Add| trait's definition. We will add an associated type called \verb|Output| and while we're at it, we will also change the name of the generic \verb|T| to \verb|Rhs| and default it to \verb|Self|:
-\footnote{This is actually how the real world \verb|Add| trait in Rust's STL is defined, with the exception of access modifiers.}
+First we must edit the \verb|Add| trait's definition. We will add an associated type called \verb|Output| and we will also change the name of the generic \verb|T| to \verb|Rhs| and default it to \verb|Self|:\footnote{This is actually how the real world \verb|Add| trait in Rust's STL is defined, with the exception of access modifiers.}
 \begin{minted}{rust}
 trait Add<Rhs = Self> {
     type Output;
@@ -143,9 +140,7 @@ Implementing the \verb|Add| trait now means one also has to define the \verb|Out
 \begin{minted}{rust}
 impl Add<f32> for usize {
     type Output = f32;
-    fn add(self, rhs: f32) -> Self::Output {
-        // ...
-    }
+    fn add(self, rhs: f32) -> Self::Output {/*...*/}
 }
 \end{minted}
 If we were to add another implementation with \\ \verb|type Output = usize|, the Rust compiler would detect the ambiguity and throw an error.

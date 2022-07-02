@@ -16,17 +16,19 @@ Parametric polymorphism is achieved the same way it is in OCaml, that is, when w
 
 \subsection{Ad-hoc Polymorphism: Type Classes}\label{haskell-type-classes}
 
-According to the Haskell committee, there was no standard solution available for ad-hoc polymorphism when they designed the language, so type classes were developed and judged successful enough to be included in the Haskell design~\cite{type-classes-original}. In its simplest form, a type class is not much more than an interface as seen in object oriented languages, meaning it simply defines a named set of operations:
+According to the Haskell committee, there was no standard solution available for ad-hoc polymorphism when they designed the language, so type classes were developed and judged successful enough to be included in the Haskell design~\cite{type-classes-original}.
+
+In its simplest form, a type class is not much more than an interface as seen in object oriented languages, meaning it simply defines a named set of operations. For example, to define an interface for checking values for equality, one can define an \verb|Eq| type class with a class parameter \verb|a|, for which a \verb|(==)| function should exist:
 \begin{minted}{haskell}
 class Eq a where (==) :: a -> a -> bool
 \end{minted}
-Mind that it's easy to misunderstand the \verb|a| class parameter as being similar to a type parameter used for parametric polymorphism, however this is not the case. Where in the parametric polymorphism case before, \verb|a| stood for \textit{any} type, in this case \verb|a| stands for a \textit{class} or \textit{set} of \textit{specific} types for which instances of \verb|Eq| exist.
-
-This also means that the type class itself so far provides no functionality. We need to create an instance of the type class for a specific type, for example for \verb|Int|:
+% Mind that it's easy to misunderstand the \verb|a| class parameter as being similar to a type parameter used for parametric polymorphism, however this is not the case. Where with parametric polymorphism, \verb|a| would stand for \textit{any} type, in this case \verb|a| stands for a \textit{class} or \textit{set} of \textit{specific} types for which instances of \verb|Eq| exist.
+% TODO maybe this is needed?
+The type class itself so far provides no functionality. We need to create an instance of the type class for a specific type, for example for \verb|Int|:
 \begin{minted}{haskell}
 instance Eq Int where (==) x y = eqInt x y
 \end{minted}
-assuming \verb|eqInt| is the equality function for integers. Similarly, an instance of the \verb|Eq| type class can be created for the specific type \verb|Float|:
+Similarly, an instance of the \verb|Eq| type class can be created for the specific type \verb|Float|:
 \begin{minted}{haskell}
 instance Eq Float where (==) x y = eqFloat x y
 \end{minted}
@@ -47,7 +49,7 @@ instance Cost Custom where
   cost Cheap = 0
   cost Expensive = 1
 \end{minted}
-Now let's say we want to define a function \verb|cheapest| that takes a list of elements of a type that defines a \verb|cost|, and then return the cheapest element of that list. Such a function could then look like this:
+Now say we want to define a function \verb|cheapest| that takes a list of elements of a type that defines a \verb|cost|, and then return the cheapest element of that list. Such a function could look like this:
 \begin{minted}{haskell}
 cheapest :: Cost a => [a] -> a
 cheapest [x] = x
@@ -58,13 +60,11 @@ cheapest (x:xs)
 \end{minted}
 Note the function's type \verb|Cost a => [a] -> a|. It means that \verb|cheapest| is a function of type \verb|[a] -> a| for any type \verb|a| that is an instance of \verb|Cost|.
 
-The similarities to parametric polymorphism are a lot more fitting in this case: \verb|a| for the \verb|cheapest| function is also a type parameter where the exact type does not matter for the function. The difference is that, whereas in the case of \verb|length|, any type can be inserted into \verb|a|, for \verb|cheapest| only types that implement a \verb|cost| can be used. This is necessary as the \verb|cost| function is used in the implementation of \verb|cheapest|. This is a natural extension of the parametric polymorphism system Haskell uses and allows for much stronger expressiveness.
+The similarities to parametric polymorphism are a lot more fitting in this case: \verb|a| for the \verb|cheapest| function is also a type parameter where the exact type does not matter for the function. The difference is that, whereas in the case of \verb|length|, any type can be inserted into \verb|a|, for \verb|cheapest| only types that implement a \verb|cost| can be used. This is necessary as the \verb|cost| function is used in the implementation of \verb|cheapest|.
 
 \subsubsection{Creating instances from other instances}
 
-One particular strength of type classes is that they allow one to create instances based on other existing type class instances. We extend the example from \autoref{constraints} to illustrate this: We are given a list of \verb|Custom|s and want to determine the overall sum of the list's costs. We could write an instance for \verb|Cost [Custom]|, however this seems rather verbose, considering we might want to have an implementation of this function for other Cost instances, too.
-
-Instead, we can define an instance of the \verb|Cost| type class for any list of type \verb|[a]| where \verb|a| has an instance for \verb|Cost|:
+One particular strength of type classes is that they allow one to create instances based on other existing type class instances. We extend the example from \autoref{constraints} to illustrate this: We are given a list of \verb|Custom|s and want to determine the overall sum of the list's costs. We could write an instance for \verb|Cost [Custom]|, however this seems rather verbose, considering we might want to have an implementation of this function for other Cost instances, too. Instead, we can define an instance of the \verb|Cost| type class for any list of type \verb|[a]| where \verb|a| has an instance for \verb|Cost|:
 \begin{minted}{haskell}
 instance Cost a => Cost [a] where
   cost = sum . map cost
@@ -75,30 +75,29 @@ This looks quite similar to type constraints and this is no coincidence. We are 
 
 % MAYBE mention scoping rules here, as done in Rust
 
-Type classes also support the notion of subclasses, however we will not cover this here as it exceeds the scope of this paper.
+% Type classes also support the notion of subclasses, however we will not cover this here as it exceeds the scope of this paper.
 % MAYBE cover this anyway?
 
 \subsubsection{Multiple Paramteres}\label{haskell-add}
 
-The default standardized Haskell definition does not allow for type classes to have more than one class parameter. However, when using modern compilers like \verb|ghc|, adding the \verb|-XMultiParamTypeClasses| compiler option allows to create type classes with multiple parameters.
+Standard Haskell does not allow for type classes to have more than one class parameter. However, modern compilers like \verb|ghc| support the \verb|-XMultiParamTypeClasses| compiler option that allows one to create type classes with multiple parameters.
 
-The most obvious limitation this solves is the fact that, with single parameter type classes and the perspective of operator overloading, we can only define an \verb|add| function to add values of the same type. With multiple parameters, one could define an \verb|Add| type class that allows adding two values of different types.
-\footnote{This is not how the \verb|add| function is implemented in standard Haskell, but this is how it \textit{could} be done.}
+The most obvious limitation this solves is the fact that, with single parameter type classes and the perspective of operator overloading, we can only define an \verb|add| function to add values of the same type. With multiple parameters, one could define an \verb|Add| type class that allows adding two values of different types.\footnote{This is not how the \verb|add| function is implemented in standard Haskell, but this is how it \textit{could} be done.}
 \begin{minted}{haskell}
 class Add a b where add :: a -> b -> a
 \end{minted}
-However this is still quite ugly as the return type of the addition is simply the first type paramter \verb|a|, which need not always be what we want. An obvious fix to this would be adding a third parameter to the \verb|Add| type class:
+However this is still quite ugly as the return type of the addition is simply the type of the first argument, which need not always be what we want. An obvious fix to this would be adding a third parameter to the \verb|Add| type class:
 \begin{minted}{haskell}
 class Add a b c where add :: a -> b -> c
 \end{minted}
 While this works, it poses a strange issue: One can define multiple additions for the same type that have a different output. Let's say we define the following instances for the \verb|Add| type class with three parameters:
 \begin{minted}{haskell}
 instance Add Int Float Int where
-  add x y = x + roundFloatInt y
+  add x y = x + floatToInt y
 instance Add Int Float Float where
   add x y = intToFloat x + y
 \end{minted}
-where \verb|roundFloatInt| and \verb|intToFloat| are \verb|Float| to \verb|Int| or \verb|Int| to \verb|Float| conversions respectively. At first this might seem fine, however when one were to write \verb|add 1 3.2|, the actual return type of such an expression is not well defined anymore and needs to be annotated explicitly for every call, e.g. \verb|add 1 3.2 :: Float|. This is not very ergonomic, thus a different more elegant solution exists.
+At first this might seem fine, however when one were to write \verb|add 1 3.2|, the actual return type of such an expression is not well defined anymore and needs to be annotated explicitly for every call, e.g. \verb|add 1 3.2 :: Float|. This is not very ergonomic, thus a different more elegant solution exists.
 
 % https://downloads.haskell.org/~ghc/7.8.4/docs/html/users_guide/type-class-extensions.html#:~:text=7.6.2.2.2.%C2%A0Adding%20functional%20dependencies
 % FUNCTIONAL DEPENDENCIES CAN ALSO FIX THIS POTENTIALLY
@@ -113,7 +112,7 @@ class Add a b where
   type AddOutput a b
   add :: a -> b -> AddOutput a b
 \end{minted}
-Here we define that with any instance of \verb|Add a b| for specific types \verb|a| and \verb|b|, there shall also be a third type that's given the name \verb|AddOutput a b|. This type is then the output of our \verb|add| function. This concept ensures that there shall only be one well defined output type for an addition of two specific types \verb|a| and \verb|b|.
+We define that with any instance of \verb|Add a b| for specific types \verb|a| and \verb|b|, there shall also be a third type that's given the name \verb|AddOutput a b|. This type is then the output of our \verb|add| function. This concept ensures that there shall only be one well defined output type for an addition of two specific types \verb|a| and \verb|b|.
 
 To define an addition for \verb|Int| and \verb|Float|, this means we have to decide what output we would even want in this case. Let's assume the choice was made to output a \verb|Float| in this case, the instance for the \verb|Add| type class would then look like this:
 \begin{minted}{haskell}
@@ -125,7 +124,7 @@ One unfortunate limitation is that the \verb|AddOutput| name is not namespaced, 
 
 \subsubsection{A matrix example}\label{haskell-matrix}
 
-Let's assume we have a data type called \verb|Matrix a| which describes a matrix whose elements are of type \verb|a|. We can then use our previously defined \verb|Add| type class to define a matrix addition for any matrices whose elements' types are addable. We will ignore the matrices' size constraints for them to be addable, as well as the implementation of the action.
+Let's assume we have a data type called \verb|Matrix a| which describes a matrix whose elements are of type \verb|a|. We can then use our previously defined \verb|Add| type class to define a matrix addition for any matrices whose elements' types are addable:
 \begin{minted}{haskell}
 instance Add a b => Add (Matrix a) (Matrix b) where
   type AddOutput (Matrix a) (Matrix b) =
@@ -134,4 +133,4 @@ instance Add a b => Add (Matrix a) (Matrix b) where
 \end{minted}
 The first line can be read as "implement \verb|Add| for two matrices whose elements' types implement \verb|Add|". The second and third lines mean "the output of such an addition shall be another matrix whose elements' type is that of the output of adding the elements of the original two matrices together".
 
-This is \textbf{not} how Haskell typically implements overloaded addition. Instead, Haskell defines a \verb|Num| type class that defines multiple operators, such as \verb|(+)| and the unary negate, and only defines those operations on two elements \textit{of the same type}. What we did here was merely to showcase the strength of an overloading system that allows for multiple parameters and associated types, and how operator overloading could be solved using these.
+Note that this is \textbf{not} how standard Haskell implements overloaded addition. Instead, Haskell has a \verb|Num| type class that defines multiple operators and only defines those operations on two elements \textit{of the same type}. We introduced our \verb|Add| type class merely to showcase multiple parameters and associated types.
