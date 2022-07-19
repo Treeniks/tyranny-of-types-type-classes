@@ -1,0 +1,8 @@
+build:
+    latexmk -pdf -silent -shell-escape -output-directory=target main
+
+watch:
+    latexmk -pdf -pvc -silent -shell-escape -output-directory=target main
+
+clean:
+    rm -rf target
