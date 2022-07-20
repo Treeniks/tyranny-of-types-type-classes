@@ -38,7 +38,7 @@
 \author{Thomas Lindae}
 
 \institute{\theChairName\\\theDepartmentName\\\theUniversityName}
-\date[21/07/2022]{July 21\textsuperscript{st}, 2022}
+\date[2022-07-21]{July 21\textsuperscript{st}, 2022}
 
 \footline{\insertauthor~|~\insertshorttitle~|~\insertshortdate}
 
@@ -89,10 +89,43 @@ length (x:xs) = 1 + length xs
 \end{frame}
 
 \begin{frame}[fragile]{Ad-hoc Polymorphism}
+Given \mintinline{haskell}{(+) :: Int -> Int -> Int} \\ and \mintinline{haskell}{(+) :: Float -> Float -> Float}. \pause \vspace{3mm}
+
+An expression such as \mintinline{haskell}{2.5 + 7.6} is easy. \pause \vspace{3mm}
+
+However, a function such as
 \begin{minted}{haskell}
 add2 (x1, x2) (y1, y2) = (x1 + y1, x2 + y2)
 \end{minted}
+\pause has exponentially many different possible types: \vspace{3mm}
+
+\begin{minted}{haskell}
+add2 :: (Int, Int) -> (Int, Int) -> (Int, Int)
+add2 :: (Int, Float) -> (Int, Float) -> (Int, Float)
+add2 :: (Float, Int) -> (Float, Int) -> (Float, Int)
+add2 :: (Float, Float) -> (Float, Float) -> (Float, Float)
+\end{minted}
 \end{frame}
+
+\begin{frame}{Style setup}
+  \texttt{tumbeamer} uses a concept of \textit{framestyles}, which are
+  collections of beamertemplate definitions combined to get a certain style.
+  Initially we defined 4 different framestyles for \texttt{title page},
+  \texttt{part page}, \texttt{section page}, and \texttt{content page},
+  respectively. \\
+  The predefined options for every framestyle are summarized on a following
+  slide. \\\vspace{3mm}
+
+  With the keys \texttt{headline} and \texttt{footline} you can choose from
+  predefined styles.
+
+  Enabling or disabling of headlines and footlines can be done on a per
+  framestyle basis with the keys \texttt{headline on} and
+  \texttt{footline on}. As value you can pass a list of framestyles or the
+  alias \texttt{every page}, which enables the headline or footline on all 4
+  framestyles.
+\end{frame}
+
 
 \section{Second Section}
 \begin{frame}{Frame of section two}
