@@ -92,7 +92,7 @@ This looks quite similar to type constraints and this is no coincidence. We are 
 
 Type classes also supports the notion of subclasses, however we will not cover this here as it exceeds the scope of this paper.
 
-### Multiple Paramteres
+### Multiple Parameters
 
 The default standardized Haskell definition does not allow for type classes to have more than one class parameter. However, modern implementations like `ghc` allow for the `-XMultiParamTypeClasses` compiler option that allow one to create type classes with multiple parameters.
 
