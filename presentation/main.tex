@@ -32,6 +32,9 @@
 
 \usepackage[outputdir=target]{minted}
 
+\usepackage[style=verbose,backend=biber]{biblatex}
+\addbibresource{biblio.bib}
+
 % presentation metadata
 \title[Comparing Type Classes and Traits]{Comparing Haskell's Type Classes to Rust's Traits (and OCaml's Modules)}
 \subtitle{}
@@ -80,7 +83,14 @@
 \maketitle
 
 \section{Types of Polymorphism}
+
 \begin{frame}[fragile]{Parametric Polymorphism}
+\begin{quote}Parametric polymorphism [...] allows a single piece of code to be typed "generically," using variables in place of actual types, and then instantiated with particular types as needed. Parametric definitions are uniform: all of their instances behave the same.
+\end{quote}~\fullcite[Chapter~23.2]{pierce-types}
+\end{frame}
+
+\begin{frame}[fragile]{Parametric Polymorphism in Haskell}
+Length function for lists in Haskell:
 \begin{minted}{haskell}
 length :: [a] -> Int
 length [] = 0
@@ -88,8 +98,35 @@ length (x:xs) = 1 + length xs
 \end{minted}
 \end{frame}
 
+\begin{frame}[fragile]{Parametric Polymorphism in Rust}
+Length function for slices in Rust:
+\begin{minted}{rust}
+fn len<T>(slice: &[T]) -> usize {
+    // calculate and return length
+}
+\end{minted}
+
+\pause \vspace{3mm}
+With the \verb|impl| keyword:
+\begin{minted}{rust}
+impl<T> [T] {
+    fn len(&self) -> usize {
+        // calculate and return length
+    }
+}
+\end{minted}
+Usage: \mintinline{rust}{my_slice.len()}
+\end{frame}
+
 \begin{frame}[fragile]{Ad-hoc Polymorphism}
-Given \mintinline{haskell}{(+) :: Int -> Int -> Int} \\ and \mintinline{haskell}{(+) :: Float -> Float -> Float}. \pause \vspace{3mm}
+\begin{quote}
+Ad-hoc polymorphism [...] allows a polymorphic value to exhibit different behaviors when "viewed" at different types. The most common example of ad-hoc polymorphism is overloading, which associates a single function symbol with many implementations; the compiler [...] chooses an appropriate implementation for each application of the function, based on the types of the arguments.
+\end{quote}~\fullcite[Chapter~23.2]{pierce-types}
+\end{frame}
+
+\begin{frame}[fragile]{Ad-hoc Polymorphism}
+Given \mintinline{haskell}{(+) :: Int -> Int -> Int} \\
+and \mintinline{haskell}{(+) :: Float -> Float -> Float} \pause \vspace{3mm}
 
 An expression such as \mintinline{haskell}{2.5 + 7.6} is easy. \pause \vspace{3mm}
 
@@ -107,34 +144,282 @@ add2 :: (Float, Float) -> (Float, Float) -> (Float, Float)
 \end{minted}
 \end{frame}
 
-\begin{frame}{Style setup}
-  \texttt{tumbeamer} uses a concept of \textit{framestyles}, which are
-  collections of beamertemplate definitions combined to get a certain style.
-  Initially we defined 4 different framestyles for \texttt{title page},
-  \texttt{part page}, \texttt{section page}, and \texttt{content page},
-  respectively. \\
-  The predefined options for every framestyle are summarized on a following
-  slide. \\\vspace{3mm}
+\section{Type Classes}
 
-  With the keys \texttt{headline} and \texttt{footline} you can choose from
-  predefined styles.
+\begin{frame}[fragile]{Type Classes in Haskell}
+Definition of a type class:
+\begin{minted}{haskell}
+class Add a where
+  (+) :: a -> a -> a
+\end{minted}
 
-  Enabling or disabling of headlines and footlines can be done on a per
-  framestyle basis with the keys \texttt{headline on} and
-  \texttt{footline on}. As value you can pass a list of framestyles or the
-  alias \texttt{every page}, which enables the headline or footline on all 4
-  framestyles.
+\pause \vspace{3mm}
+
+Instantiation of a type class:
+\begin{minted}{haskell}
+instance Add Int where
+  (+) x y = addInt x y
+
+instance Add Float where
+  (+) x y = addFloat x y
+\end{minted}
+
+\pause \vspace{3mm}
+
+Both \mintinline{haskell}{2 + 3} and \mintinline{haskell}{2.5 + 7.6} now work.
 \end{frame}
 
+\begin{frame}[fragile]{Type Classes in Rust (Traits)}
+Definition of a trait:
+\begin{minted}{rust}
+trait Add {
+    fn add(self, other: Self) -> Self;
+}
+\end{minted}
 
-\section{Second Section}
-\begin{frame}{Frame of section two}
-  \begin{enumerate}
-    \item one
-    \item two
-    \item three
-    \item four
-  \end{enumerate}
+\pause \vspace{3mm}
+
+Implementation of a trait:
+\begin{minted}{rust}
+impl Add for usize {
+    fn add(self, other: Self) -> Self {
+        add_usize(self, other)
+    }
+}
+\end{minted}
 \end{frame}
+
+\section{Type Constraints}
+
+\begin{frame}[fragile]{Type Constraints in Haskell}
+Reminder:
+\begin{minted}{haskell}
+add2 (x1, x2) (y1, y2) = (x1 + y1, x2 + y2)
+\end{minted}
+
+\pause \vspace{3mm}
+
+Typed with type constraints:
+\begin{minted}{haskell}
+add2 :: (Add a, Add b) => (a, b) -> (a, b) -> (a, b)
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Type Constraints in Rust (Trait Bounds)}
+\begin{minted}{rust}
+fn add2<T, U>((x1, x2): (T, U), (y1, y2): (T, U)) -> (T, U)
+where
+    T: Add,
+    U: Add,
+{
+    (x1.add(y1), x2.add(y2))
+}
+\end{minted}
+\end{frame}
+
+\section{Creating Instances From Other Instances}
+
+\begin{frame}[fragile]{Creating Instances From Other Instances in Haskell}
+We can transform \mintinline{haskell}{add2} to its own \mintinline{haskell}{Add} instance.
+\begin{minted}{haskell}
+add2 :: (Add a, Add b) => (a, b) -> (a, b) -> (a, b)
+add2 (x1, x2) (y1, y2) = (x1 + y1, x2 + y2)
+\end{minted}
+
+\pause \vspace{6mm}
+
+\begin{minted}{haskell}
+instance (Add a, Add b) => Add (a, b) where
+  (+) (x1, x2) (y1, y2) = (x1 + y1, x2 + y2)
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Creating Implementations From Other Implementations in Rust}
+\begin{minted}{rust}
+impl<T, U> Add for (T, U)
+where
+    T: Add,
+    U: Add,
+{
+    fn add(self, other: Self) -> Self {
+        let (x1, x2) = self;
+        let (y1, y2) = other;
+        (x1.add(y1), x2.add(y2))
+    }
+}
+\end{minted}
+\end{frame}
+
+\section{Multiple Class Parameters}
+
+\begin{frame}[fragile]{Multiple Class Parameters in Haskell}
+Using the \verb|-XMultiParamTypeClasses| compiler option allows for multiple class parameters:
+\begin{minted}{haskell}
+class Add a b c where
+  add :: a -> b -> c
+\end{minted}
+
+\pause \vspace{6mm}
+
+\begin{minted}{haskell}
+instance Add Int Float Int where
+  add x y = x + floatToInt y
+
+instance Add Int Float Float where
+  add x y = intToFloat x + y
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Multiple Class Parameters in Rust (Generic Traits)}
+\begin{minted}{rust}
+trait Add<T, U> {
+    fn add(self, rhs: T) -> U;
+}
+
+impl Add<f32, usize> for usize {
+    fn add(self, rhs: f32) -> usize {
+        // ...
+    }
+}
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Multiple Class Parameters}
+Problem: The return type of the operation is not well defined.
+
+\vspace{6mm}
+
+It is necessary to specify the return type for every call:
+\begin{minted}{haskell}
+(1 + 3.2) :: Float
+\end{minted}
+
+\pause \vspace{6mm}
+
+Rust uses its Fully Qualified Syntax for Disambiguation:
+\begin{minted}{rust}
+<usize as Add<f32, usize>>::add(1_usize, 3.2_f32)
+\end{minted}
+
+\pause \vspace{3mm}
+
+Or alternatively bind it to a variable:
+\begin{minted}{rust}
+let k: usize = 1_usize.add(3.2_f32);
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Multiple Class Parameters}
+\begin{minted}{haskell}
+class Add a b c where
+  add :: a -> b -> c
+\end{minted}
+
+\vspace{3mm}
+
+Solution: Make \verb|c| fully dependent on \verb|a| and \verb|b|.
+\end{frame}
+
+\section{Associated Types}
+
+\begin{frame}[fragile]{Associated Types in Haskell}
+Using the \verb|-XTypeFamilies| compiler option:
+\begin{minted}{haskell}
+class Add a b where
+  type AddOutput a b
+  add :: a -> b -> AddOutput a b
+\end{minted}
+
+\pause \vspace{6mm}
+
+\begin{minted}{haskell}
+instance Add Int Float where
+  type AddOutput Int Float = Float
+  add x y = intToFloat x + y
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{Associated Types in Rust}
+\begin{minted}{rust}
+trait Add<Rhs = Self> {
+    type Output;
+
+    fn add(self, rhs: Rhs) -> Self::Output;
+}
+\end{minted}
+
+\pause \vspace{3mm}
+
+\begin{minted}{rust}
+impl Add<f32> for usize {
+    type Output = f32;
+
+    fn add(self, rhs: f32) -> Self::Output { /* ... */ }
+}
+\end{minted}
+\end{frame}
+
+\section{A Matrix Example}
+
+\begin{frame}[fragile]{A Matrix Example in Haskell}
+Assume a type called \mintinline{haskell}{Matrix a}.
+
+\pause \vspace{3mm}
+
+\begin{minted}{haskell}
+instance Add a b => Add (Matrix a) (Matrix b) where
+  type AddOutput (Matrix a) (Matrix b) =
+    Matrix (AddOutput a b)
+  add x y = -- ...
+\end{minted}
+\end{frame}
+
+\begin{frame}[fragile]{A Matrix Example in Rust}
+Assume a type called \mintinline{rust}{Matrix<T>}.
+
+\pause \vspace{3mm}
+
+\begin{minted}{rust}
+impl<Tlhs, Trhs, Tout> Add<Matrix<Trhs>> for Matrix<Tlhs>
+where
+    Tlhs: Add<Trhs, Output = Tout>,
+{
+    type Output = Matrix<Tout>;
+
+    fn add(self, rhs: Matrix<Trhs>) -> Self::Output {
+        // ...
+    }
+}
+\end{minted}
+\end{frame}
+
+% \begin{frame}[fragile]{Matrices With Const Generics in Rust}
+% \begin{minted}{rust}
+% struct Matrix<T, const M: usize, const N: usize> {
+%     // ...
+% }
+
+% trait Mul<Rhs = Self> {
+%     type Output;
+
+%     fn mul(self, rhs: Rhs) -> Self::Output;
+% }
+% \end{minted}
+% \end{frame}
+
+% \begin{frame}[fragile]{Matrices With Const Generics in Rust}
+% \begin{minted}{rust}
+% impl<Tlhs, Trhs, Tout, const M: usize, const N: usize, const L: usize> Mul<Matrix<Trhs, N, L>>
+%     for Matrix<Tlhs, M, N>
+% where
+%     Tlhs: Mul<Trhs, Output = Tout>,
+%     Tout: Sum,
+% {
+%     type Output = Matrix<Tout, M, L>;
+
+%     fn mul(self, rhs: Matrix<Trhs, N, L>) -> Self::Output { /* ... */ }
+% }
+% \end{minted}
+% \end{frame}
 
 \end{document}
