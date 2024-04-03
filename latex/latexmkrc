@@ -1,0 +1,2 @@
+$out_dir = 'target';
+$bibtex = "bibtex -include-directory=.. %O %B";
