@@ -98,7 +98,7 @@ Because we left out the implementations of these functions, it might not be imme
 
 Functors, as the name would suggest, are something similar to functions. In a sense, they can be seen as compile-time functions that take modules as arguments, and return other modules. They can also be seen as a sort of macro for module definitions.
 
-A functor in our case could define the implementation of an entire \verb|DenseMatrix| for any type \verb|elem| that implements an addition. Thus we must first define what "implements an addition" means, which we do by defining a module signature:
+A functor in our case could define the implementation of an entire \verb|DenseMatrix| for any type \verb|elem| that implements an addition. Thus we must first define what ``implements an addition'' means, which we do by defining a module signature:
 \begin{minted}{ocaml}
 module type Addable =
   sig

@@ -156,7 +156,7 @@ impl<T> Add for Matrix<T> where T: Add<Output = T> {
     }
 }
 \end{minted}
-Note that we do not have to specify the type of the right hand side, as it defaults to \verb|Self|, which is \verb|Matrix<T>| in this case. Note also that we had to bound \verb|T| to be addable with itself where the result is again a \verb|T|. The \verb|where| clause can thus be read as "implement only for types \verb|T| that are addable with itself and where such an addition returns a \verb|T|".
+Note that we do not have to specify the type of the right hand side, as it defaults to \verb|Self|, which is \verb|Matrix<T>| in this case. Note also that we had to bound \verb|T| to be addable with itself where the result is again a \verb|T|. The \verb|where| clause can thus be read as ``implement only for types \verb|T| that are addable with itself and where such an addition returns a \verb|T|''.
 
 We extend this implementation for additions where the element type of the right hand side matrix (which we will call \verb|U|) is different to the element type of the left hand side matrix (\verb|T|). We also make the Output type of the addition of a \verb|T| and \verb|U| variable, by giving the output type the name \verb|O|:
 \begin{minted}{rust}

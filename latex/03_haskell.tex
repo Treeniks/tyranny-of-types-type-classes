@@ -133,6 +133,6 @@ instance Add a b => Add (Matrix a) (Matrix b) where
     Matrix (AddOutput a b)
   add x y = -- ...
 \end{minted}
-The first line can be read as "implement \verb|Add| for two matrices whose elements' types implement \verb|Add|". The second and third lines mean "the output of such an addition shall be another matrix whose elements' type is that of the output of adding the elements of the original two matrices together".
+The first line can be read as ``implement \verb|Add| for two matrices whose elements' types implement \verb|Add|''. The second and third lines mean ``the output of such an addition shall be another matrix whose elements' type is that of the output of adding the elements of the original two matrices together''.
 
 Note that this is \textbf{not} how standard Haskell implements overloaded addition. Instead, Haskell has a \verb|Num| type class that defines multiple operators and only defines those operations on two elements \textit{of the same type}. We introduced our \verb|Add| type class merely to showcase multiple parameters and associated types.
