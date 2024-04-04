@@ -12,7 +12,9 @@ For the actual submission, I was given a page limit because of which I had to le
 
 I originally started writing the paper with Markdown and mdBook and then translated it over and did further edits in latex. I then re-translated those changes back into mdBook. Thus there is a `latex` and a `mdbook` folder in this repository. Both versions are almost identical, with some small tweaks and a little more code in the mdBook version.
 
-I also had to hold a presentation about the topic, the slides for which can be found in the `presentation` folder. They are written in LaTeX with beamer and use TUM's design template. There are no notes or the likes and the slides themselves aren't very useful as the actual presentation was very freestyle.
+I also had to hold a presentation about the topic, the slides for which can be found in the `presentation` folder. They are written in LaTeX with beamer and use TUM's design template. There are no notes or the likes and the slides themselves aren't very useful as the actual presentation was mostly freestyle.
+
+Later in 2024 I found out about [Typst](https://typst.app/home/) and translated this paper into it to try it out. The result can be found in the `typst` folder.
 
 ## Build
 
@@ -27,4 +29,10 @@ To build the mdBook, you'll need to install [mdbook-katex](https://github.com/lz
 cargo install mdbook-katex
 cd mdbook
 mdbook build
+```
+
+To build the Typst paper:
+```
+cd typst
+typst compile main.typ
 ```
