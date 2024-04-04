@@ -5,4 +5,4 @@ watch:
     typst watch main.typ
 
 clean:
-    rm main.pdf
+    rm -f main.pdf
