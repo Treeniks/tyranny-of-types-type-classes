@@ -3,6 +3,6 @@ authors = ["Thomas Lindae"]
 language = "en"
 multilingual = false
 src = "src"
-title = "Comparing Haskell's Type Classes to Rust's Traits and Ocaml's Modules"
+title = "Comparing Haskell's Type Classes to Rust's Traits and OCaml's Modules"
 
 [preprocessor.katex]

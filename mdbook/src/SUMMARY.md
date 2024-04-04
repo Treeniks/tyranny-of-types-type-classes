@@ -6,5 +6,5 @@
 - [Types of Polymorphism](./02_polymorphism.md)
 - [Haskell](./03_haskell.md)
 - [Rust](./04_rust.md)
-- [Ocaml](./05_ocaml.md)
+- [OCaml](./05_ocaml.md)
 - [Conclusion](./06_conclusion.md)

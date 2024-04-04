@@ -1,21 +1,18 @@
 # Rust
 
-Rust is known to be a language that combines many different features of many different programming languages into one language, with the goal of keeping the good and eliminating the bad with each addition.
-When it comes to polymorphism, Rust combines the concept of type classes with generics, the latter of which is usually seen in object oriented languages like Java, C# and C++.
+Rust is known to be a language that combines different features of different programming languages into one language, with the goal of only keeping whatever works best and eliminating whatever doesn't. When it comes to polymorphism, Rust combines the concept of type classes with generics, the latter of which is usually seen in object oriented languages like Java, C# and C++.
 
 ## Generics: Rust's Parametric Polymorphism
 
 Generics, in their simplest form, are a form of parametric polymorphism. As such, the length function on slices can be defined with a generic which we will name `T`.
 
-> Because Rust only implements many ideas from functional languages, but is in itself a C-like imperative language and thus not purely functional, the terminology used for similar things will be slightly different, so will the syntax. In this case for example, we use a slice in place of a list. A slice in Rust is a reference to a specific area inside an array (or similar), and it can also be a reference to the entire array itself. The type `usize` is one of Rust's unsigned integer types and will be used as such.
+> Because Rust only implements many ideas from functional languages, but is in itself a C-like imperative language, the terminology used for similar things will be slightly different, so will the syntax. In this case, we use a slice in place of a list. A slice in Rust is a reference to a specific area inside an array (or similar), or to the entire array itself. The type `usize` is one of Rust's unsigned integer types. Also, pay no mind to ampersands inside the Rust code, as it is not of importance for this topic.
 
 ```rust
 fn len<T>(slice: &[T]) -> usize {
     // calculate and return length
 }
 ```
-
-> Pay no mind to the abundance of ampersands inside this Rust code, it is not of importance for this topic.
 We will leave out the implementation of the length function here, because it requires knowledge of the underlying layout of slices. The function [is given by Rust's STL](https://doc.rust-lang.org/std/primitive.slice.html#method.len).
 
 We will also slightly alter the declaration of this function. As it stands, `len` is declared as a standalone function, but in the real Rust STL it is actually defined as a member function on the slice primitive. To implement member functions on types, Rust uses the `impl` keyword. Note that we also must declare the generic `T` with the `impl` keyword, as the type we are implementing on itself uses the generic:
@@ -30,46 +27,38 @@ impl<T> [T] {
 
 ## Traits: Rust's Type Classes
 
-Rust's traits are heavily inspired by type classes[^rust-reference] and, in their simplest form, will look quite similar. As we did with Haskell, we will first define an equality trait:
+In their simplest form, traits are the exact same concept as type classes, they simply define a named set of operations. This is because Rust's traits are heavily inspired by type classes[^rust-reference-20.2]. The main difference between the two being a slight change in nomenclature. Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the `a` in `class Eq a`, in Rust this type is implicitly called `Self`. `Self` is not the same as `self`, `self` is a value and `Self` is `self`'s type.
+
+To see how traits work, we will implement the same equality type class from ["Haskell | Ad-hoc Polymorphism: Type Classes"](03_haskell.md#ad-hoc-polymorphism-type-classes):
 ```rust
 trait Eq {
     fn eq(&self, other: &Self) -> bool;
 }
 ```
-
 > Rust's STL also defines an `Eq` trait, however this is actually a marker trait without any function declarations. Instead, what we are doing here is more similar to the STL's `PartialEq` trait (although that one also has a default implementation for not equals).
-
-Whereas in Haskell we explicitly gave the type we are later instancing on a name, i.e. the `a` in `class Eq a`, in Rust this type is implicitly called `Self`.
 
 What we called a type class instance in Haskell we call a trait implementation in Rust, because doing so extends the previously used `impl` keyword:
 ```rust
 impl Eq for usize {
     fn eq(&self, other: &Self) -> bool {
-        eq_usize(self, other)
+        // ...
     }
 }
 ```
-assuming `eq_usize` is the equality function for `usize`s.
-
-We can of course also implement the trait on other types:
+We can of course also implement the trait on other types, such as Rust's floating point primitive `f32`:
 ```rust
 impl Eq for f32 {
     fn eq(&self, other: &Self) -> bool {
-        eq_f32(self, other)
+        // ...
     }
 }
 ```
-where `f32` is a floating point primitive of Rust and `eq_f32` is the equality function for that primitive.
 
-Like with Haskell, as Rust is also statically typed, calling `eq` on either `usize` or `f32` types will automatically pick the correct function at compile time, and calling it on any other type will give us a compile time error.
-
-[^rust-reference]: ["The Rust Reference" by The Rust Project Developers](https://doc.rust-lang.org/reference/)
+Like Haskell, Rust is also statically typed, and therefore calling `eq` on either `usize` or `f32` types will automatically pick the correct function at compile time, and calling it on any other type will give us a compile time error.
 
 ### Trait bounds: Rust's type constraints
 
-Trait bounds allow us to tell the Rust compiler that a generic function only makes sense, if those generic types implement a specific trait. This is the exact same as Haskell's type constraints. As such, we will look at the same `Cost` example.
-
-First we define the `Cost` trait itself:
+Trait bounds allow us to tell the Rust compiler that a generic function only makes sense, if those generic types implement a specific trait. This is the exact same as Haskell's type constraints discussed in ["Haskell | Type constraints"](03_haskell.md#type-constraints). We will also use the same `Cost` example and thus first define a `Cost` trait:
 ```rust
 trait Cost {
     fn cost(&self) -> usize;
@@ -104,7 +93,7 @@ where
         .unwrap()
 }
 ```
-Inside the `cheapest` function, we use the `cost` method on elements of the slice. To be able to do so, we must tell the compiler that elements of the slice implement such function, which we do by giving the `cheapest` function a `where` clause. Inside a `where` clause, we can define as many trait bounds as we want which are of the form `type: bound`. In this case, we are adding a bound `Cost` for the generic `T` inside the `where` clause, meaning that the function `cheapest` shall only exist for `T`s that have a `Cost` implementation.
+Inside the `cheapest` function, we use the `cost` method on elements of the slice. To do so, we must tell the compiler that elements of the slice implement such function, which is done by giving the `cheapest` function a `where` clause. Inside a `where` clause, we can define as many trait bounds as we want which are of the form `type: bound`. In this case, we are adding a bound `Cost` for the generic `T` inside the `where` clause, meaning that the function `cheapest` shall only exist for `T`s that have a `Cost` implementation.
 
 ### Creating implementations from other implementations
 
@@ -119,7 +108,8 @@ where
     }
 }
 ```
-Mind you, Rust only allows us to do so if *either* the type we're implementing on *or* the trait is not foreign, i.e. local to the current crate (which is Rust's version of a package)[^rust-book]. This is done to prevent certain situations that could cause ambiguities when selecting a method.
+<!-- Rust only allows us to do so if *either* the type we're implementing on *or* the trait is not foreign, i.e. local to the current crate (which is Rust's version of a package)[^rust-book]. This is done to prevent certain situations that could cause ambiguities when selecting a method. -->
+<!-- TODO the above is not really necessary is it? -->
 
 ### Generic traits: Rust's multi-parameter type classes
 
@@ -131,13 +121,13 @@ trait Add<T> {
 ```
 Unlike in Haskell, we did not have to enable a language extension first, as Rust supports this out of the box.
 
-As before, the output is set to be of the same type as the left hand side, which we can fix by adding a second generic:
+As in ["Haskell | Multiple Parameters"](03_haskell.md#multiple-parameters), the output is set to be of the same type as the left hand side, which we could fix by adding a second generic:
 ```rust
 trait Add<T, U> {
     fn add(self, rhs: T) -> U;
 }
 ```
-Which, again as before, poses the issue that an addition between two types does not have a well defined output type. We can again implement addition between integers and floating point numbers with differing outputs:
+Which again poses the issue that an addition between two types does not have a well defined output type. We can implement addition between integers and floating point numbers with differing outputs:
 ```rust
 impl Add<f32, usize> for usize {
     fn add(self, rhs: f32) -> usize {
@@ -151,20 +141,18 @@ impl Add<f32, f32> for usize {
     }
 }
 ```
-If we were to now call `1_usize.add(3.2_f32)`, we would have to specify *which* `add` function we want to call:
+If we were to call `1_usize.add(3.2_f32)`, we would have to specify *which* `add` function we want to call:
 ```rust
 <usize as Add<f32, f32>>::add(1_usize, 3.2_f32)
 ```
 
-> This uses Rust's Fully Qualified Syntax for Disambiguation[^rust-book] and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: `let k: f32 = 1_usize.add(3.2_f32);`.
+> This uses Rust's [Fully Qualified Syntax for Disambiguation](https://doc.rust-lang.org/stable/book/ch19-03-advanced-traits.html?highlight=fully%20qualified#fully-qualified-syntax-for-disambiguation-calling-methods-with-the-same-name) and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: `let k: f32 = 1_usize.add(3.2_f32);`.
 
 ### Associated types
 
-Once again, Rust also defines the notion of associated types, which also work very similar to Haskell.
+Once again, Rust also defines the notion of associated types, which also work very similar to Haskell. Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
 
-Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
-
-First we must edit the `Add` trait's definition. We will add an associated type called `Output` and while we're at it, we will also change the name of the generic `T` to `Rhs` and default it to `Self`:
+First we must edit the `Add` trait's definition. We will add an associated type called `Output` and we will also change the name of the generic `T` to `Rhs` and default it to `Self`:
 ```rust
 trait Add<Rhs = Self> {
     type Output;
@@ -172,7 +160,6 @@ trait Add<Rhs = Self> {
     fn add(self, rhs: Rhs) -> Self::Output;
 }
 ```
-
 > This is actually how the real world `Add` trait in Rust's STL is defined, with the exception of access modifiers.
 
 The type `Output` is now fixed for a given `Self` and `Rhs` type. Notice how we didn't call the associated type `AddOutput` like we did in the Haskell example. The reason being that, in Rust, the associated type is in the namespace of the surrounding trait. That is why, to use the associated type as the output type of the `add` function, we need to qualify it as `Self::Output` which implicitly translates to `<Self as Add<Rhs>>::Output` inside this trait. That way, we can reuse the `Output` name for all operations.
@@ -187,13 +174,13 @@ impl Add<f32> for usize {
     }
 }
 ```
-If we were now to add another implementation with \\ `type Output = usize`, the Rust compiler would give us an error.
+If we were to add another implementation with `type Output = usize`, the Rust compiler would detect the ambiguity and throw an error.
 
 ### A matrix example
 
-Rust generics can also be used for structs, which are Rust's custom data types. To mirror the matrix example from Haskell, let us assume we have a generic matrix struct `Matrix<T>` where the matrix's elements are of type `T`.
+Rust generics can also be used for structs, which are Rust's custom data types. To mirror the matrix example from ["Haskell | A matrix example"](03_haskell.md#a-matrix-example), let us assume we have a generic matrix struct `Matrix<T>` where the matrix's elements are of type `T`.
 
-As Rust's syntax gets more complicated, especially if one is not used to it, we will do it step by step this time. First, we will define the addition over matrices with the same `T`:
+First, we will define the addition over matrices with the same `T`:
 ```rust
 impl<T> Add for Matrix<T>
 where
@@ -206,24 +193,9 @@ where
     }
 }
 ```
-Note that we do not have to specify the type of the right hand side, as it defaults to `Self`, which is `Matrix<T>` in this case. Note also that we had to bound `T` to be addable with itself where the result is again a `T`. The `where` clause can thus be read as "implement only for types `T` that are addable with itself and where such addition returns a `T`".
+Note that we do not have to specify the type of the right hand side, as it defaults to `Self`, which is `Matrix<T>` in this case. Note also that we had to bound `T` to be addable with itself where the result is again a `T`. The `where` clause can thus be read as "implement only for types `T` that are addable with itself and where such an addition returns a `T`".
 
-We can first make the Output type of the addition of two `T`s variable, by giving the output type the name `Tout`:
-```rust
-impl<T, Tout> Add for Matrix<T>
-where
-    T: Add<Output = Tout>,
-{
-    type Output = Matrix<Tout>;
-
-    fn add(self, rhs: Matrix<T>) -> Self::Output {
-        // ...
-    }
-}
-```
-This might seem a bit weird, but if we're trying to make our matrix as generic as possible, we include types whose addition result in a new type.
-
-Now let us extend this implementation for additions where the element type of the right hand side matrix is different to the element type of the left hand side matrix:
+We extend this implementation for additions where the element type of the right hand side matrix (which we will call `Trhs`) is different to the element type of the left hand side matrix (`Tlhs`). We also make the Output type of the addition of a `Tlhs` and `Trhs` variable, by giving the output type the name `Tout`:
 ```rust
 impl<Tlhs, Trhs, Tout> Add<Matrix<Trhs>> for Matrix<Tlhs>
 where
@@ -259,13 +231,15 @@ trait Mul<Rhs = Self> {
 }
 ```
 
-Now let us see how we can implement a matrix multiplication. Reminder: matrix multiplication is a function
+Reminder: Matrix multiplication is defined by the following function:
 $$
 \begin{aligned}
 \texttt{Tlhs}^{\texttt{M} \times \texttt{N}} \times \texttt{Trhs}^{\texttt{N} \times \texttt{L}} \to \texttt{Tout}^{\texttt{M} \times \texttt{L}} : (A, B) \mapsto C \\
 \text{where } \forall i, j: c_{i, j} = \sum_{k = 1}^{\texttt{N}} a_{i, k} \cdot b_{k, j}
 \end{aligned}
-$$.
+$$
+
+With this, we can construct a trait implementation for the `Matrix` struct:
 ```rust
 impl<Tlhs, Trhs, Tout, const M: usize, const N: usize, const L: usize> Mul<Matrix<Trhs, N, L>>
     for Matrix<Tlhs, M, N>
@@ -279,11 +253,13 @@ where
 }
 ```
 
-> Technically we would also need to add `Copy` or `Clone` trait bounds for an implementation to work, however for that we would need to talk about Rust's ownership system which is out of scope for this paper.
+> Technically we would also need to add `Copy` or `Clone` trait bounds for an implementation to work. However, for the sake of simplicity, we will leave those out.
 
 At first we define all generics used, which are `Tlhs`, `Trhs`, `Tout` as well as all three const generics `M`, `N` and `L`.
-Afterwards we can read the rest of the line as "implement multiplication between matrices of type $\texttt{Tlhs}^{\texttt{M} \times \texttt{N}}$ and $\texttt{Trhs}^{\texttt{N} \times \texttt{L}}$". The trait bound for `Tlhs` is as expected, however note how we also have to define that `Tout` needs to be sum-able in some way, with `Sum` being another trait defining such functionality that we have not defined here.
+Afterwards we can read the rest of the line as "implement multiplication between matrices of type $\texttt{Tlhs}^{\texttt{M} \times \texttt{N}}$ and $\texttt{Trhs}^{\texttt{N} \times \texttt{L}}$". The trait bound for `Tlhs` is as expected, however note how we also have to define that `Tout` needs to be sum-able in some way, with `Sum` being another trait defining such functionality.
 
-The defining strength here is that we define multiplication *only* on matrices that have the correct size, and as that size also must be known at compile time, that means that we can also check if the matrices' sizes are correct at compile time. We can also deduce the resulting size of such an operation, all at compile time. To achieve this, in many languages one would have to manually define matrices of specific sizes, however in Rust we can do so completely generically and it will work with matrices of *any* sizes.
+What's impressive is that we define multiplication *only* on matrices that have the correct size, and as that size also must be known at compile time, that means that we can also check if the matrices' sizes are correct at compile time. We can also deduce the resulting size of such an operation, all at compile time. We did do so completely generically and it will work with matrices of *any* size.
+
+[^rust-reference-20.2]: ["The Rust Reference"; Chapter 20.2](https://doc.rust-lang.org/reference/influences.html)
 
 [^rust-book]: ["The Rust Programming Language" by Steve Klabnik and Carol Nichols](https://doc.rust-lang.org/stable/book/)
