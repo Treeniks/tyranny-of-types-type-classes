@@ -13,7 +13,7 @@ let rec length l =
   | [] -> 0
   | x::xs -> 1 + length xs
 \end{minted}
-The inferred type of length would then be
+The inferred type of \verb|length| would then be
 \begin{minted}{ocaml}
 val length : 'a list -> int
 \end{minted}

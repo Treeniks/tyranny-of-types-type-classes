@@ -14,7 +14,7 @@ let rec length l =
   | [] -> 0
   | x::xs -> 1 + length xs
 ```
-The inferred type of length would then be
+The inferred type of `length` would then be
 ```ocaml
 val length : 'a list -> int
 ```
