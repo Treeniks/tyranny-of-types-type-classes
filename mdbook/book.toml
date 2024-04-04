@@ -5,4 +5,7 @@ multilingual = false
 src = "src"
 title = "Comparing Haskell's Type Classes to Rust's Traits and OCaml's Modules"
 
+[output.html]
+git-repository-url = "https://github.com/Treeniks/tyranny-of-types-type-classes"
+
 [preprocessor.katex]
