@@ -4,3 +4,5 @@
 
 ensure_path( 'TEXINPUTS', './tum//' );
 
+$out_dir = 'target';
+$bibtex = "bibtex -include-directory=.. %O %B";
