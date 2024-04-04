@@ -1,11 +1,10 @@
 \section{Rust}
 
-Rust is known to be a language that combines different features of different programming languages into one language, with the goal of only keeping whatever works best and eliminating whatever doesn't.
-When it comes to polymorphism, Rust combines the concept of type classes with generics, the latter of which is usually seen in object oriented languages like Java, C\# and C++.
+Rust is known to be a language that combines different features of different programming languages into one language, with the goal of only keeping whatever works best and eliminating whatever doesn't. When it comes to polymorphism, Rust combines the concept of type classes with generics, the latter of which is usually seen in object oriented languages like Java, C\# and C++.
 
 \subsection{Generics: Rust's Parametric Polymorphism}
 
-Generics, in their simplest form, are a form of parametric polymorphism. As such, the length function on slices can be defined with a generic which we will name \verb|T|.\footnote{Because Rust only implements many ideas from functional languages, but is in itself a C-like imperative language, the terminology used for similar things will be slightly different, so will the syntax. In this case, we use a slice in place of a list. A slice in Rust is a reference to a specific area inside an array (or similar), or to the entire array itself. The type \verb|usize| is one of Rust's unsigned integer types. Also, pay no mind to ampersands inside this paper's Rust code, as it is not of importance for this topic.}
+Generics, in their simplest form, are a form of parametric polymorphism. As such, the length function on slices can be defined with a generic which we will name \verb|T|.\footnote{Because Rust only implements many ideas from functional languages, but is in itself a C-like imperative language, the terminology used for similar things will be slightly different, so will the syntax. In this case, we use a slice in place of a list. A slice in Rust is a reference to a specific area inside an array (or similar), or to the entire array itself. The type \verb|usize| is one of Rust's unsigned integer types. Also, pay no mind to ampersands inside the Rust code, as it is not of importance for this topic.}
 \begin{minted}{rust}
 fn len<T>(slice: &[T]) -> usize {
     // calculate and return length
@@ -35,8 +34,7 @@ What we called a type class instance in Haskell we call a trait implementation i
 \begin{minted}{rust}
 impl Eq for usize {
     fn eq(&self, other: &Self) -> bool {
-        // equality function for values of type usize
-        eq_usize(self, other)
+        // ...
     }
 }
 \end{minted}
@@ -44,12 +42,12 @@ We can of course also implement the trait on other types, such as Rust's floatin
 \begin{minted}{rust}
 impl Eq for f32 {
     fn eq(&self, other: &Self) -> bool {
-        eq_f32(self, other)
+        // ...
     }
 }
 \end{minted}
 
-Like with Haskell, Rust is also statically typed, and therefore calling \verb|eq| on either \verb|usize| or \verb|f32| types will automatically pick the correct function at compile time, and calling it on any other type will give us a compile time error.
+Like Haskell, Rust is also statically typed, and therefore calling \verb|eq| on either \verb|usize| or \verb|f32| types will automatically pick the correct function at compile time, and calling it on any other type will give us a compile time error.
 
 \subsubsection{Trait bounds: Rust's type constraints}
 
@@ -90,7 +88,7 @@ impl<T> Cost for [T] where T: Cost {
     }
 }
 \end{minted}
-% Rust only allows us to do so if \textit{either} the type we're implementing on \textit{or} the trait is not foreign, i.e. local to the current crate (which is Rust's version of a package)~\cite{rust-book}. This is done to prevent certain situations that could cause ambiguities when selecting a method.
+% Rust only allows us to do so if \emph{either} the type we're implementing on \emph{or} the trait is not foreign, i.e. local to the current crate (which is Rust's version of a package)~\cite{rust-book}. This is done to prevent certain situations that could cause ambiguities when selecting a method.
 % TODO the above is not really necessary is it?
 
 \subsubsection{Generic traits: Rust's multi-parameter type classes}
@@ -101,7 +99,7 @@ trait Add<T> { fn add(self, rhs: T) -> Self; }
 \end{minted}
 Unlike in Haskell, we did not have to enable a language extension first, as Rust supports this out of the box.
 
-As in \autoref{haskell-add}, the output is set to be of the same type as the left hand side, which we can fix by adding a second generic:
+As in \autoref{haskell-add}, the output is set to be of the same type as the left hand side, which we could fix by adding a second generic:
 \begin{minted}{rust}
 trait Add<T, U> { fn add(self, rhs: T) -> U; }
 \end{minted}
@@ -118,12 +116,12 @@ impl Add<f32, f32> for usize {
     }
 }
 \end{minted}
-If we were to call \verb|1_usize.add(3.2_f32)|, we would have to specify \textit{which} \verb|add| function we want to call:\footnote{This uses Rust's Fully Qualified Syntax for Disambiguation~\cite{rust-book} and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: \verb|let k: f32 = 1_usize.add(3.2_f32);|.}
+If we were to call \verb|1_usize.add(3.2_f32)|, we would have to specify \emph{which} \verb|add| function we want to call:\footnote{This uses Rust's Fully Qualified Syntax for Disambiguation~\cite[Chapter~19.2]{rust-book} and it looks rather complex. However, by simply binding the result to a variable, it would be enough to give said variable a type: \verb|let k: f32 = 1_usize.add(3.2_f32);|.}
 \mint{rust}|<usize as Add<f32, f32>>::add(1_usize, 3.2_f32)|
 
 \subsubsection{Associated types}\label{rust-associated-types}
 
-Once again, Rust also defines the notion of associated types, which also works very similar to Haskell. Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
+Once again, Rust also defines the notion of associated types, which also work very similar to Haskell. Just as in Haskell, an associated type is another type parameter that is fixed for a specific configuration of types inserted in the generics. And as before, we will use an associated type to define the output type of an addition.
 
 First we must edit the \verb|Add| trait's definition. We will add an associated type called \verb|Output| and we will also change the name of the generic \verb|T| to \verb|Rhs| and default it to \verb|Self|:\footnote{This is actually how the real world \verb|Add| trait in Rust's STL is defined, with the exception of access modifiers.}
 \begin{minted}{rust}
@@ -172,53 +170,54 @@ where
 \end{minted}
 This is essentially the exact same as Haskell's matrix example.
 
-% \subsubsection{Making the matrix's size known at compile time}
+% ===== removed to fit within the page limit
+\subsubsection{Making the matrix's size known at compile time}
 
-% As one last extension to our matrix example, we can make use of Rust's system for \textit{const generics}. These offer a limited form of dependent types in Rust, limited in the sense that the values for each generic must be known at compile time and cannot be changed at runtime.
+As one last extension to our matrix example, we can make use of Rust's system for \emph{const generics}. These offer a limited form of dependent types in Rust, limited in the sense that the values for each generic must be known at compile time and cannot be changed at runtime.
 
-% What this allows us to do is define matrix multiplication only for matrices of correct sizes. To demonstrate, let us first look at how the appropriate matrix struct would be defined:
-% \begin{minted}{rust}
-% struct Matrix<T, const M: usize, const N: usize> {
-%     // ...
-% }
-% \end{minted}
-% We can view this as a definition of matrices of type $\texttt{T}^{\texttt{M} \times \texttt{N}}$.
+What this allows us to do is define matrix multiplication only for matrices of correct sizes. To demonstrate, let us first look at how the appropriate matrix struct would be defined:
+\begin{minted}{rust}
+struct Matrix<T, const M: usize, const N: usize> {
+    // ...
+}
+\end{minted}
+We can view this as a definition of matrices of type \( \texttt{T}^{\texttt{M} \times \texttt{N}} \).
 
-% To see how one would implement a matrix multiplication, we will first have to define a \verb|Mul| trait, which will look very similar to the \verb|Add| trait:
-% \begin{minted}{rust}
-% trait Mul<Rhs = Self> {
-%     type Output;
+To see how one would implement a matrix multiplication, we will first have to define a \verb|Mul| trait, which will look very similar to the \verb|Add| trait:
+\begin{minted}{rust}
+trait Mul<Rhs = Self> {
+    type Output;
 
-%     fn mul(self, rhs: Rhs) -> Self::Output;
-% }
-% \end{minted}
+    fn mul(self, rhs: Rhs) -> Self::Output;
+}
+\end{minted}
 
-% \begin{figure*}[h]
-% \begin{minted}{rust}
-% impl<Tlhs, Trhs, Tout, const M: usize, const N: usize, const L: usize> Mul<Matrix<Trhs, N, L>>
-%     for Matrix<Tlhs, M, N>
-% where
-%     Tlhs: Mul<Trhs, Output = Tout>,
-%     Tout: Sum,
-% {
-%     type Output = Matrix<Tout, M, L>;
+\begin{figure*}
+\begin{minted}{rust}
+impl<T, U, O, const M: usize, const N: usize, const L: usize> Mul<Matrix<U, N, L>>
+    for Matrix<T, M, N>
+where
+    T: Mul<U, Output = O>,
+    O: Sum,
+{
+    type Output = Matrix<O, M, L>;
 
-%     fn mul(self, rhs: Matrix<Trhs, N, L>) -> Self::Output { /* ... */ }
-% }
-% \end{minted}
-% \caption{Rust matrix example with const generics}
-% \label{full-matrix}
-% \end{figure*}
+    fn mul(self, rhs: Matrix<U, N, L>) -> Self::Output { /* ... */ }
+}
+\end{minted}
+\caption{Rust matrix example with const generics}
+\label{full-matrix}
+\end{figure*}
 
-% \autoref{full-matrix} shows how we can implement a matrix multiplication.
-% \footnote{Technically we would also need to add \verb|Copy| or \verb|Clone| trait bounds for an implementation to work, however for that we would need to talk about Rust's ownership system which is out of scope for this paper.}
-% Reminder: matrix multiplication is a function
-% \begin{align*}
-% \texttt{Tlhs}^{\texttt{M} \times \texttt{N}} \times \texttt{Trhs}^{\texttt{N} \times \texttt{L}} \to \texttt{Tout}^{\texttt{M} \times \texttt{L}} : (A, B) \mapsto C \\
-% \text{where } \forall i, j: c_{i, j} = \sum_{k = 1}^{\texttt{N}} a_{i, k} \cdot b_{k, j}
-% \end{align*}.
+Reminder: Matrix multiplication is defined by the following function:
+\begin{align*}
+\texttt{T}^{\texttt{M} \times \texttt{N}} \times \texttt{U}^{\texttt{N} \times \texttt{L}} \to \texttt{O}^{\texttt{M} \times \texttt{L}} : (A, B) \mapsto C \\
+\text{where } \forall i, j: c_{i, j} = \sum_{k = 1}^{\texttt{N}} a_{i, k} \cdot b_{k, j}
+\end{align*}
+With this, \autoref{full-matrix} shows how we can construct a trait implementation for the \verb|Matrix| struct.\footnote{Technically we would also need to add \verb|Copy| or \verb|Clone| trait bounds for an implementation to work. However, for the sake of simplicity, we will leave those out.}
 
-% At first we define all generics used, which are \verb|Tlhs|, \verb|Trhs|, \verb|Tout| as well as all three const generics \verb|M|, \verb|N| and \verb|L|.
-% Afterwards we can read the rest of the line as "implement multiplication between matrices of type $\texttt{Tlhs}^{\texttt{M} \times \texttt{N}}$ and $\texttt{Trhs}^{\texttt{N} \times \texttt{L}}$". The trait bound for \verb|Tlhs| is as expected, however note how we also have to define that \verb|Tout| needs to be sum-able in some way, with \verb|Sum| being another trait defining such functionality that we have not defined here.
+At first we define all generics used, which are \verb|T|, \verb|U|, \verb|O| as well as all three const generics \verb|M|, \verb|N| and \verb|L|.
+Afterwards we can read the rest of the line as "implement multiplication between matrices of type $\texttt{T}^{\texttt{M} \times \texttt{N}}$ and $\texttt{U}^{\texttt{N} \times \texttt{L}}$". The trait bound for \verb|T| is as expected, however note how we also have to define that \verb|O| needs to be sum-able in some way, with \verb|Sum| being another trait defining such functionality that we have not defined here.
 
-% The defining strength here is that we define multiplication \textit{only} on matrices that have the correct size, and as that size also must be known at compile time, that means that we can also check if the matrices' sizes are correct at compile time. We can also deduce the resulting size of such an operation, all at compile time. To achieve this, in many languages one would have to manually define matrices of specific sizes, however in Rust we can do so completely generically and it will work with matrices of \textit{any} sizes.
+What's impressive is that we define multiplication \emph{only} on matrices that have the correct size, and as that size also must be known at compile time, that means that we can also check if the matrices' sizes are correct at compile time. We can also deduce the resulting size of such an operation, all at compile time. We did so completely generically and it will work with matrices of \emph{any} size.
+% =====

@@ -5,25 +5,29 @@ Haskell supports both parametric and ad-hoc polymorphism.
 \subsection{Parametric Polymorphism}
 
 Parametric polymorphism is achieved the same way it is in OCaml, that is, when writing a function that does not rely on its parameters' types, then one can define the function's type with type parameters.
-% TODO really remove this example?
-% For example, the list length function:
-% \begin{minted}{haskell}
-% length :: [a] -> Int
-% length [] = 0
-% length (x:xs) = 1 + length xs
-% \end{minted}
-% where \verb|a| is the type parameter for the type of the list's elements.
+
+% ===== removed to fit within the page limit
+For example, the list length function:
+\begin{minted}{haskell}
+length :: [a] -> Int
+length [] = 0
+length (x:xs) = 1 + length xs
+\end{minted}
+where \verb|a| is the type parameter for the type of the list's elements.
+% =====
 
 \subsection{Ad-hoc Polymorphism: Type Classes}\label{haskell-type-classes}
 
-According to the Haskell committee, there was no standard solution available for ad-hoc polymorphism when they designed the language, so type classes were developed and judged successful enough to be included in the Haskell design~\cite{type-classes-original}.
+According to the Haskell committee, there was no standard solution available for ad-hoc polymorphism when they designed the language, so \emph{type classes} were developed and judged successful enough to be included in the Haskell design~\cite{type-classes-original}.
 
 In its simplest form, a type class is not much more than an interface as seen in object oriented languages, meaning it simply defines a named set of operations. For example, to define an interface for checking values for equality, one can define an \verb|Eq| type class with a class parameter \verb|a|, for which a \verb|(==)| function should exist:
 \begin{minted}{haskell}
 class Eq a where (==) :: a -> a -> bool
 \end{minted}
-% Mind that it's easy to misunderstand the \verb|a| class parameter as being similar to a type parameter used for parametric polymorphism, however this is not the case. Where with parametric polymorphism, \verb|a| would stand for \textit{any} type, in this case \verb|a| stands for a \textit{class} or \textit{set} of \textit{specific} types for which instances of \verb|Eq| exist.
-% TODO maybe this is needed?
+% ===== removed to fit within the page limit
+Mind that it's easy to misunderstand the \verb|a| class parameter as being similar to a type parameter used for parametric polymorphism, however this is not the case. Where with parametric polymorphism, \verb|a| would stand for \emph{any} type, in this case \verb|a| stands for a \emph{class} or \emph{set} of \emph{specific} types for which instances of \verb|Eq| exist.
+% =====
+
 The type class itself so far provides no functionality. We need to create an instance of the type class for a specific type, for example for \verb|Int|:
 \begin{minted}{haskell}
 instance Eq Int where (==) x y = eqInt x y
@@ -36,7 +40,7 @@ When we now try to use the \verb|(==)| function with parameters of types other t
 
 \subsubsection{Type constraints}\label{constraints}
 
-So far, we have seen how we can use type classes to overload functions defined \textit{within} the type class, however we can also use them to define standalone functions with types implementing specific type classes.
+So far, we have seen how we can use type classes to overload functions defined \emph{within} the type class, however we can also use them to define standalone functions with types implementing specific type classes.
 
 Assume we want to define some kind of cost to our data types. We can use a type class to convey this idea:
 \begin{minted}{haskell}
@@ -82,7 +86,7 @@ This looks quite similar to type constraints and this is no coincidence. We are 
 
 Standard Haskell does not allow for type classes to have more than one class parameter. However, modern compilers like \verb|ghc| support the \verb|-XMultiParamTypeClasses| compiler option that allows one to create type classes with multiple parameters.
 
-The most obvious limitation this solves is the fact that, with single parameter type classes and the perspective of operator overloading, we can only define an \verb|add| function to add values of the same type. With multiple parameters, one could define an \verb|Add| type class that allows adding two values of different types.\footnote{This is not how the \verb|add| function is implemented in standard Haskell, but this is how it \textit{could} be done.}
+The most obvious limitation this solves is the fact that, with single parameter type classes and the perspective of operator overloading, we can only define an \verb|add| function to add values of the same type. With multiple parameters, one could define an \verb|Add| type class that allows adding two values of different types.\footnote{This is not how the \verb|add| function is implemented in standard Haskell, but this is how it \emph{could} be done.}
 \begin{minted}{haskell}
 class Add a b where add :: a -> b -> a
 \end{minted}
@@ -135,4 +139,4 @@ instance Add a b => Add (Matrix a) (Matrix b) where
 \end{minted}
 The first line can be read as ``implement \verb|Add| for two matrices whose elements' types implement \verb|Add|''. The second and third lines mean ``the output of such an addition shall be another matrix whose elements' type is that of the output of adding the elements of the original two matrices together''.
 
-Note that this is \textbf{not} how standard Haskell implements overloaded addition. Instead, Haskell has a \verb|Num| type class that defines multiple operators and only defines those operations on two elements \textit{of the same type}. We introduced our \verb|Add| type class merely to showcase multiple parameters and associated types.
+Note that this is \textbf{not} how standard Haskell implements overloaded addition. Instead, Haskell has a \verb|Num| type class that defines multiple operators, such as \verb|(+)| and the unary negate, and only defines those operations on two elements \emph{of the same type}. We introduced our \verb|Add| type class merely to showcase multiple parameters and associated types.
