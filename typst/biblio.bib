@@ -1,0 +1,79 @@
+@inproceedings{type-classes-original,
+    author = {Wadler, P. and Blott, S.},
+    title = {How to Make Ad-Hoc Polymorphism Less Ad Hoc},
+    year = {1989},
+    isbn = {0897912942},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/75277.75283},
+    doi = {10.1145/75277.75283},
+    abstract = {This paper presents type classes, a new approach to ad-hoc polymorphism. Type classes permit overloading of arithmetic operators such as multiplication, and generalise the “eqtype variables” of Standard ML. Type classes extend the Hindley/Milner polymorphic type system, and provide a new approach to issues that arise in object-oriented programming, bounded type quantification, and abstract data types. This paper provides an informal introduction to type classes, and defines them formally by means of type inference rules.},
+    booktitle = {Proceedings of the 16th ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+    pages = {60-76},
+    numpages = {17},
+    location = {Austin, Texas, USA},
+    series = {POPL '89}
+}
+
+@inproceedings{functional-lists,
+    author="Bagwell, Phil",
+    editor="Pe{\~{n}}a, Ricardo
+    and Arts, Thomas",
+    title="Fast Functional Lists",
+    booktitle="Implementation of Functional Languages",
+    year="2003",
+    publisher="Springer Berlin Heidelberg",
+    address="Berlin, Heidelberg",
+    pages="34--50",
+    abstract="Since J. McCarthy first introduced Functional Programming, the Linked List has almost universally been used as the underpinning data structure. This paper introduces a new data structure, the VList, that is compact, thread safe and significantly faster to use than Linked Lists for nearly all list operations. Space usage can be reduced by 50{\%} to 90{\%} and in typical list operations speed improved by factors ranging from 4 to 20 or more. Some important operations such as indexing and length are typically changed from O(N) to O(1) and O(lgN) respectively. In the current form the VList structure can provide an alternative heap architecture for functional languages using eager evaluation. To prove the viability of the new structure a language interpreter Visp, a dialect of Common Lisp, has been implemented using VList and a simple benchmark comparison with OCAML reported.",
+    isbn="978-3-540-44854-9"
+}
+
+@inproceedings{modular-type-classes,
+    author = {Dreyer, Derek and Harper, Robert and Chakravarty, Manuel M. T. and Keller, Gabriele},
+    title = {Modular Type Classes},
+    year = {2007},
+    isbn = {1595935754},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/1190216.1190229},
+    doi = {10.1145/1190216.1190229},
+    abstract = {ML modules and Haskell type classes have proven to be highly effective tools for program structuring. Modules emphasize explicit configuration of program components and the use of data abstraction. Type classes emphasize implicit program construction and ad hoc polymorphism. In this paper, we show how the implicitly-typed style of type class programming may be supported within the framework of an explicitly-typed module language by viewing type classes as a particular mode of use of modules. This view offers a harmonious integration of modules and type classes, where type class features, such as class hierarchies and associated types, arise naturally as uses of existing module-language constructs, such as module hierarchies and type components. In addition, programmers have explicit control over which type class instances are available for use by type inference in a given scope. We formalize our approach as a Harper-Stone-style elaboration relation, and provide a sound type inference algorithm as a guide to implementation.},
+    booktitle = {Proceedings of the 34th Annual ACM SIGPLAN-SIGACT Symposium on Principles of Programming Languages},
+    pages = {63-70},
+    numpages = {8},
+    keywords = {modules, type inference, type classes, type systems},
+    location = {Nice, France},
+    series = {POPL '07}
+}
+
+@book{rust-book,
+    title = {The Rust Programming Language},
+    author = {Klabnik, Steve and Nichols, Carol},
+    year = {2018},
+    isbn = {1593278284},
+    publisher = {No Starch Press},
+}
+
+@online{rust-reference,
+  title={The Rust Reference},
+  author={The Rust Project Developers},
+  year={2022},
+  url={https://doc.rust-lang.org/reference/},
+  urldate={2022-06-04},
+}
+
+@online{rust-len,
+  title={The Rust Standard Library},
+  author={The Rust Project Developers},
+  year={2022},
+  url={https://doc.rust-lang.org/std/primitive.slice.html},
+  urldate={2022-07-01},
+}
+
+@book{pierce-types,
+  title={Types and programming languages},
+  author={Pierce, Benjamin C},
+  year={2002},
+  publisher={MIT press}
+}
