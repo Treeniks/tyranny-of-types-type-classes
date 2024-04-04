@@ -65,7 +65,6 @@ The main difference to type classes (and by extension the reason why OCaml modul
         ```
     ],
     caption: [OCaml matrix example with dense and sparse matrix],
-    placement: top,
 ) <ocaml-all-matrix>
 
 Let's take one step back and slightly alter our ```ocaml Matrix``` module signature.
