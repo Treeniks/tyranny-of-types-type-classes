@@ -1,7 +1,11 @@
 build:
+    mkdir -p target
+    cp biblio.bib target/biblio.bib
     latexmk -pdf -silent -shell-escape -output-directory=target main
 
 watch:
+    mkdir -p target
+    cp biblio.bib target/biblio.bib
     latexmk -pdf -pvc -silent -shell-escape -output-directory=target main
 
 clean:
